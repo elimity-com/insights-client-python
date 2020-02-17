@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, time
 from enum import Enum
 from typing import List, Union
 
@@ -14,7 +14,7 @@ class AttributeAssignment:
     def model(self) -> dict:
         return {
             'attributeTypeName': self.attribute_type_name,
-            'value': self.value
+            'value': self.value.model()
         }
 
 
@@ -38,6 +38,12 @@ class AttributeType:
 class BooleanValue:
     value: bool
 
+    def model(self) -> dict:
+        return {
+            'type': Type.boolean.name,
+            'value': 'true' if self.value else 'false'
+        }
+
 
 class Client:
     def __init__(self, config: 'Config', disable_ssl_check: 'bool') -> None:
@@ -51,8 +57,9 @@ class Client:
         self._post_request(path, body)
 
     def create_relationship_attribute_type(self, relationship_attribute_type: 'RelationshipAttributeType') -> None:
-        # TODO: implement this when the backend API provides this endpoint
-        raise NotImplementedError
+        body = relationship_attribute_type.model()
+        path = 'relationshipAttributeTypes'
+        self._post_request(path, body)
 
     def reload_domain_graph(self, domain_graph: 'DomainGraph') -> None:
         body = domain_graph.model()
@@ -68,7 +75,7 @@ class Client:
         resp.raise_for_status()
         return resp.json()['token']
 
-    def _post_request(self, path, body) -> None:
+    def _post_request(self, path: 'str', body: 'dict') -> None:
         url = '{}/{}'.format(self.config.url, path)
         headers = {'Authorization': 'Bearer {}'.format(self._access_token)}
         resp = requests.post(url,
@@ -89,10 +96,22 @@ class Config:
 class DateValue:
     value: datetime
 
+    def model(self) -> dict:
+        return {
+            'type': Type.date.name,
+            'value': '{:%Y-%m-%d}'.format(self.value)
+        }
+
 
 @dataclass
 class DateTimeValue:
     value: datetime
+
+    def model(self) -> dict:
+        return {
+            'type': Type.date_time.name,
+            'value': '{:%Y-%m-%d %H:%M:%SZ%Z}'.format(self.value)
+        }
 
 
 @dataclass
@@ -118,10 +137,10 @@ class Entity:
     type: str
 
     def model(self) -> dict:
-        attributeAssignments = list(map(lambda a: a.model(), self.attribute_assignments))
+        attribute_assignments = list(map(lambda a: a.model(), self.attribute_assignments))
         return {
             'active': self.active,
-            'attributeAssignments': attributeAssignments,
+            'attributeAssignments': attribute_assignments,
             'id': self.id,
             'name': self.name,
             'type': self.type
@@ -131,6 +150,12 @@ class Entity:
 @dataclass
 class NumberValue:
     value: float
+
+    def model(self) -> dict:
+        return {
+            'type': Type.number.name,
+            'value': '{}'.format(self.value)
+        }
 
 
 @dataclass
@@ -158,25 +183,47 @@ class RelationshipAttributeType:
     name: str
     to_entity_type: str
     type: 'Type'
+    description: str
+
+    def model(self) -> dict:
+        return {
+            'childType': self.to_entity_type,
+            'description': self.description,
+            'name': self.name,
+            'parentType': self.from_entity_type,
+            'type': self.type
+        }
 
 
 @dataclass
 class TimeValue:
-    value: datetime
+    value: time
+
+    def model(self) -> dict:
+        return {
+            'type': Type.time.name,
+            'value': '{:%H:%M:%SZ%Z}'.format(self.value)
+        }
 
 
 @dataclass
 class StringValue:
     value: str
 
+    def model(self) -> dict:
+        return {
+            'type': Type.string.name,
+            'value': self.value
+        }
+
 
 class Type(str, Enum):
-    BOOLEAN = 'boolean'
-    DATE = 'date'
-    DATE_TIME = 'date_time'
-    NUMBER = 'number'
-    STRING = 'string'
-    TIME = 'time'
+    boolean = 1
+    date = 2
+    date_time = 3
+    number = 4
+    string = 5
+    time = 6
 
 
 Value = Union[BooleanValue, DateValue, DateTimeValue, NumberValue, StringValue, TimeValue]
