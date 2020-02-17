@@ -120,8 +120,8 @@ class DomainGraph:
     relationships: List['Relationship']
 
     def model(self) -> dict:
-        entities = list(map(lambda e: e.model(), self.entities))
-        relationships = list(map(lambda r: r.model(), self.relationships))
+        entities = list(map(Entity.model, self.entities))
+        relationships = list(map(Relationship.model, self.relationships))
         return {
             'entities': entities,
             'relationships': relationships
@@ -137,7 +137,7 @@ class Entity:
     type: str
 
     def model(self) -> dict:
-        attribute_assignments = list(map(lambda a: a.model(), self.attribute_assignments))
+        attribute_assignments = list(map(AttributeAssignment.model, self.attribute_assignments))
         return {
             'active': self.active,
             'attributeAssignments': attribute_assignments,
@@ -167,7 +167,7 @@ class Relationship:
     to_entity_type: str
 
     def model(self) -> dict:
-        attributeAssignments = list(map(lambda a: a.model(), self.attribute_assignments))
+        attributeAssignments = list(map(AttributeAssignment.model, self.attribute_assignments))
         return {
             'attributeAssignments': attributeAssignments,
             'fromId': self.from_entity_id,
