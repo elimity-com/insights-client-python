@@ -49,9 +49,10 @@ class BooleanValue:
 
 class Client:
     def __init__(self, config: 'Config', disable_ssl_check: 'bool') -> None:
-        self.config = config
+        self._config = config
         self._disable_ssl_check = disable_ssl_check
-        self._access_token = self._get_token()
+        self._access_token = self._get_token(self._config.password, self._config.user_name, self._config.url,
+                                             self._disable_ssl_check)
 
     def create_attribute_type(self, attribute_type: AttributeType) -> None:
         body = attribute_type.model()
@@ -68,23 +69,24 @@ class Client:
         path = 'domain-graph/reload'
         self._post_request(path, body)
 
-    def _get_token(self) -> str:
-        body = {'type': 'password', 'value': self.config.password}
-        url = '{}/authenticate/{}'.format(self.config.url, self.config.user_name)
-        resp = requests.post(url,
-                             verify=not self._disable_ssl_check,
-                             json=body)
-        resp.raise_for_status()
-        return resp.json()['token']
-
     def _post_request(self, path: 'str', body: 'dict') -> None:
-        url = '{}/{}'.format(self.config.url, path)
+        url = '{}/{}'.format(self._config.url, path)
         headers = {'Authorization': 'Bearer {}'.format(self._access_token)}
         resp = requests.post(url,
                              verify=not self._disable_ssl_check,
                              json=body,
                              headers=headers)
         resp.raise_for_status()
+
+    @staticmethod
+    def _get_token(password: 'str', user_name: 'str', url: 'str', disable_ssl_check: 'bool') -> str:
+        body = {'type': 'password', 'value': password}
+        url = '{}/authenticate/{}'.format(url, user_name)
+        resp = requests.post(url,
+                             verify=not disable_ssl_check,
+                             json=body)
+        resp.raise_for_status()
+        return resp.json()['token']
 
 
 @dataclass
