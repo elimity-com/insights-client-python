@@ -1,11 +1,9 @@
 from dataclasses import dataclass
-from datetime import datetime, time, date
+from datetime import datetime, time, date, timezone
 from enum import Enum
-from time import timezone
 from typing import List, Union
 
 import requests
-from dateutil.tz import UTC
 
 
 @dataclass
@@ -42,7 +40,7 @@ class BooleanValue:
 
     def model(self) -> dict:
         return {
-            'type': Type.boolean.name,
+            'type': 'boolean',
             'value': 'true' if self.value else 'false'
         }
 
@@ -51,8 +49,7 @@ class Client:
     def __init__(self, config: 'Config', disable_ssl_check: 'bool') -> None:
         self._config = config
         self._disable_ssl_check = disable_ssl_check
-        self._access_token = self._get_token(self._config.password, self._config.user_name, self._config.url,
-                                             self._disable_ssl_check)
+        self._access_token = self._get_token(config.password, config.user_name, config.url, disable_ssl_check)
 
     def create_attribute_type(self, attribute_type: AttributeType) -> None:
         body = attribute_type.model()
@@ -102,7 +99,7 @@ class DateValue:
 
     def model(self) -> dict:
         return {
-            'type': Type.date.name,
+            'type': 'date',
             'value': '{:%Y-%m-%d}'.format(self.value)
         }
 
@@ -112,10 +109,10 @@ class DateTimeValue:
     value: datetime
 
     def model(self) -> dict:
-        value = self.value.astimezone(UTC)
+        value = self.value.astimezone(timezone.utc)
         value_str = '{:%Y-%m-%dT%H:%M:%S}Z'.format(value)
         return {
-            'type': Type.date_time.name,
+            'type': 'dateTime',
             'value': value_str
         }
 
@@ -159,7 +156,7 @@ class NumberValue:
 
     def model(self) -> dict:
         return {
-            'type': Type.number.name,
+            'type': 'number',
             'value': '{}'.format(self.value)
         }
 
@@ -206,9 +203,12 @@ class TimeValue:
     value: time
 
     def model(self) -> dict:
+        value_dt = datetime(2000, 1, 1, self.value.hour, self.value.minute, self.value.second,
+                            tzinfo=self.value.tzinfo)
+        value_dt_utc = value_dt.astimezone(timezone.utc)
         return {
-            'type': Type.time.name,
-            'value': '{:%H:%M:%SZ%Z}'.format(self.value)
+            'type': 'time',
+            'value': '{:%H:%M:%S}Z'.format(value_dt_utc)
         }
 
 
@@ -218,7 +218,7 @@ class StringValue:
 
     def model(self) -> dict:
         return {
-            'type': Type.string.name,
+            'type': 'string',
             'value': self.value
         }
 

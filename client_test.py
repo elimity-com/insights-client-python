@@ -6,6 +6,7 @@ from client import Client as ElimityClient, Config, AttributeType, Type, DomainG
     AttributeAssignment, BooleanValue, DateTimeValue, TimeValue, DateValue, NumberValue, StringValue, \
     RelationshipAttributeType
 
+
 class TestClient(TestCase):
 
     def setUp(self) -> None:
@@ -35,7 +36,7 @@ class TestClient(TestCase):
             'name': attribute_type_input.name,
             'type': attribute_type_input.type
         }
-        expected_headers = {'Authorization': 'Bearer {}'.format(self.elimity_client._get_token())}
+        expected_headers = {'Authorization': 'Bearer token'}
         self.post_request_mock.assert_called_with(expected_url, headers=expected_headers, verify=False,
                                                   json=expected_json)
 
@@ -55,7 +56,7 @@ class TestClient(TestCase):
             'parentType': relationship_attribute_type_input.from_entity_type,
             'type': relationship_attribute_type_input.type
         }
-        expected_headers = {'Authorization': 'Bearer {}'.format(self.elimity_client._get_token())}
+        expected_headers = {'Authorization': 'Bearer token'}
         self.post_request_mock.assert_called_with(expected_url, headers=expected_headers, verify=False,
                                                   json=expected_json)
 
@@ -74,7 +75,7 @@ class TestClient(TestCase):
                     ),
                     AttributeAssignment(
                         attribute_type_name='baq',
-                        value=DateTimeValue(datetime.datetime(2006, 1, 2, 13, 4, 5))
+                        value=DateTimeValue(datetime.datetime(2006, 1, 2, 12, 4, 5, tzinfo=datetime.timezone.utc))
                     ),
                     AttributeAssignment(
                         attribute_type_name='baw',
@@ -93,7 +94,7 @@ class TestClient(TestCase):
                     attribute_assignments=[
                         AttributeAssignment(
                             attribute_type_name='baz',
-                            value=TimeValue(datetime.time(15, 4, 5))
+                            value=TimeValue(datetime.time(15, 4, 5, tzinfo=datetime.timezone.utc))
                         )
                     ],
                     id='bar',
@@ -134,7 +135,7 @@ class TestClient(TestCase):
                         {
                             'attributeTypeName': 'baq',
                             'value': {
-                                'type': 'date_time',
+                                'type': 'dateTime',
                                 'value': '2006-01-02T12:04:05Z'
                             }
                         },
@@ -183,6 +184,6 @@ class TestClient(TestCase):
                 }
             ]
         }
-        expected_headers = {'Authorization': 'Bearer {}'.format(self.elimity_client._get_token())}
+        expected_headers = {'Authorization': 'Bearer token'}
         self.post_request_mock.assert_called_with(expected_url, headers=expected_headers, verify=False,
                                                   json=expected_json)
