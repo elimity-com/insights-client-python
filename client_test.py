@@ -5,10 +5,7 @@ from unittest.mock import patch, MagicMock
 from client import Client as ElimityClient, Config, AttributeType, Type, DomainGraph, Entity, Relationship, \
     AttributeAssignment, BooleanValue, DateTimeValue, TimeValue, DateValue, NumberValue, StringValue, \
     RelationshipAttributeType
-from util import random_string
 
-
-# @patch('requests.post')
 class TestClient(TestCase):
 
     def setUp(self) -> None:
@@ -26,7 +23,7 @@ class TestClient(TestCase):
 
     def test_create_attribute_type(self) -> None:
         attribute_type_input = AttributeType(entity_type='foo',
-                                             name=random_string(5),
+                                             name='bar',
                                              type=Type.string,
                                              description='some description')
         self.elimity_client.create_attribute_type(attribute_type_input)
@@ -45,7 +42,7 @@ class TestClient(TestCase):
     def test_create_relationship_attribute_type(self) -> None:
         relationship_attribute_type_input = RelationshipAttributeType(from_entity_type='foo',
                                                                       to_entity_type='bar',
-                                                                      name=random_string(5),
+                                                                      name='baz',
                                                                       type=Type.string,
                                                                       description='some description')
         self.elimity_client.create_relationship_attribute_type(relationship_attribute_type_input)
@@ -138,7 +135,7 @@ class TestClient(TestCase):
                             'attributeTypeName': 'baq',
                             'value': {
                                 'type': 'date_time',
-                                'value': '2006-01-02 13:04:05Z'
+                                'value': '2006-01-02T12:04:05Z'
                             }
                         },
                         {

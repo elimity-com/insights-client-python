@@ -1,9 +1,11 @@
 from dataclasses import dataclass
-from datetime import datetime, time
+from datetime import datetime, time, date
 from enum import Enum
+from time import timezone
 from typing import List, Union
 
 import requests
+from dateutil.tz import UTC
 
 
 @dataclass
@@ -94,7 +96,7 @@ class Config:
 
 @dataclass
 class DateValue:
-    value: datetime
+    value: date
 
     def model(self) -> dict:
         return {
@@ -108,9 +110,11 @@ class DateTimeValue:
     value: datetime
 
     def model(self) -> dict:
+        value = self.value.astimezone(UTC)
+        value_str = '{:%Y-%m-%dT%H:%M:%S}Z'.format(value)
         return {
             'type': Type.date_time.name,
-            'value': '{:%Y-%m-%d %H:%M:%SZ%Z}'.format(self.value)
+            'value': value_str
         }
 
 
