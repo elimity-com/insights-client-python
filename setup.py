@@ -1,7 +1,7 @@
 import setuptools
 
 setuptools.setup(
-    name="Elimity Insights Python client",  # Replace with your own username
+    name="Elimity Insights Python client",
     version="0.0.1",
     author="Elimity",
     author_email="tom@elimity.com",
