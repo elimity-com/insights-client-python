@@ -2,7 +2,7 @@ import datetime
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
-from client import Client as ElimityClient, Config, AttributeType, Type, DomainGraph, Entity, Relationship, \
+from insights_client.client import Client as ElimityClient, Config, AttributeType, Type, DomainGraph, Entity, Relationship, \
     AttributeAssignment, BooleanValue, DateTimeValue, TimeValue, DateValue, NumberValue, StringValue, \
     RelationshipAttributeType
 
@@ -10,13 +10,13 @@ from client import Client as ElimityClient, Config, AttributeType, Type, DomainG
 class TestClient(TestCase):
 
     def setUp(self) -> None:
+        ElimityClient._get_token = MagicMock(return_value='token')
         self._patch_post_request = patch('requests.post')
         self._patch_get_token = patch('client.Client._get_token', return_value='token')
         self.post_request_mock = self._patch_post_request.start()
         self.get_token_mock = self._patch_get_token.start()
         self.client_config = Config('password', 'user_name', 'api_url')
         self.elimity_client = ElimityClient(self.client_config, disable_ssl_check=True)
-        self.elimity_client._get_token = MagicMock(return_value='token')
 
     def tearDown(self) -> None:
         self._patch_post_request.stop()
