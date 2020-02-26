@@ -31,10 +31,10 @@ class TestClient(TestCase):
 
         expected_url = self.client_config.url + '/attributeTypes'
         expected_json = {
-            'category': attribute_type_input.entity_type,
-            'description': attribute_type_input.description,
-            'name': attribute_type_input.name,
-            'type': attribute_type_input.type
+            'category': 'foo',
+            'description': 'some description',
+            'name': 'bar',
+            'type': 'string'
         }
         expected_headers = {'Authorization': 'Bearer token'}
         self.post_request_mock.assert_called_with(expected_url, headers=expected_headers, verify=False,

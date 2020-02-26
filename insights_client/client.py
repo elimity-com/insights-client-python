@@ -30,7 +30,7 @@ class AttributeType:
             'category': self.entity_type,
             'description': self.description,
             'name': self.name,
-            'type': self.type
+            'type': self.type.model()
         }
 
 
@@ -40,7 +40,7 @@ class BooleanValue:
 
     def model(self) -> dict:
         return {
-            'type': 'boolean',
+            'type': Type.boolean.model(),
             'value': 'true' if self.value else 'false'
         }
 
@@ -99,7 +99,7 @@ class DateValue:
 
     def model(self) -> dict:
         return {
-            'type': 'date',
+            'type': Type.date.model(),
             'value': '{:%Y-%m-%d}'.format(self.value)
         }
 
@@ -112,7 +112,7 @@ class DateTimeValue:
         value = self.value.astimezone(timezone.utc)
         value_str = '{:%Y-%m-%dT%H:%M:%S}Z'.format(value)
         return {
-            'type': 'dateTime',
+            'type': Type.date_time.model(),
             'value': value_str
         }
 
@@ -156,7 +156,7 @@ class NumberValue:
 
     def model(self) -> dict:
         return {
-            'type': 'number',
+            'type': Type.number.model(),
             'value': '{}'.format(self.value)
         }
 
@@ -207,7 +207,7 @@ class TimeValue:
                             tzinfo=self.value.tzinfo)
         value_dt_utc = value_dt.astimezone(timezone.utc)
         return {
-            'type': 'time',
+            'type': Type.time.model(),
             'value': '{:%H:%M:%S}Z'.format(value_dt_utc)
         }
 
@@ -218,18 +218,32 @@ class StringValue:
 
     def model(self) -> dict:
         return {
-            'type': 'string',
+            'type': Type.string.model(),
             'value': self.value
         }
 
 
-class Type(str, Enum):
+class Type(Enum):
     boolean = 1
     date = 2
     date_time = 3
     number = 4
     string = 5
     time = 6
+
+    def model(self) -> str:
+        if self == Type.boolean:
+            return 'boolean'
+        elif self == Type.date:
+            return 'date'
+        elif self ==  Type.date_time:
+            return 'dateTime'
+        elif self == Type.number:
+            return 'number'
+        elif self == Type.string:
+            return 'string'
+        elif self == Type.time:
+            return 'time'
 
 
 Value = Union[BooleanValue, DateValue, DateTimeValue, NumberValue, StringValue, TimeValue]
