@@ -49,7 +49,7 @@ class Client:
     def __init__(self, config: 'Config', disable_ssl_check: 'bool') -> None:
         self._config = config
         self._disable_ssl_check = disable_ssl_check
-        self._access_token = self._get_token(config.password, config.user_name, config.url, disable_ssl_check)
+        self._token = ''
 
     def create_attribute_type(self, attribute_type: AttributeType) -> None:
         body = attribute_type.model()
@@ -68,19 +68,23 @@ class Client:
 
     def _post_request(self, path: 'str', body: 'dict') -> None:
         url = '{}/{}'.format(self._config.url, path)
-        headers = {'Authorization': 'Bearer {}'.format(self._access_token)}
+        headers = {'Authorization': 'Bearer {}'.format(self._access_token())}
         resp = requests.post(url,
                              verify=not self._disable_ssl_check,
                              json=body,
                              headers=headers)
         resp.raise_for_status()
 
-    @staticmethod
-    def _get_token(password: 'str', user_name: 'str', url: 'str', disable_ssl_check: 'bool') -> str:
-        body = {'type': 'password', 'value': password}
-        url = '{}/authenticate/{}'.format(url, user_name)
+    def _access_token(self) -> str:
+        if self._token == '':
+            self._token = self._get_token()
+        return self._token
+
+    def _get_token(self) -> str:
+        body = {'type': 'password', 'value': self._config.password}
+        url = '{}/authenticate/{}'.format(self._config.url, self._config.username)
         resp = requests.post(url,
-                             verify=not disable_ssl_check,
+                             verify=not self._disable_ssl_check,
                              json=body)
         resp.raise_for_status()
         return resp.json()['token']
@@ -89,7 +93,7 @@ class Client:
 @dataclass
 class Config:
     password: str
-    user_name: str
+    username: str
     url: str
 
 
@@ -236,7 +240,7 @@ class Type(Enum):
             return 'boolean'
         elif self == Type.date:
             return 'date'
-        elif self ==  Type.date_time:
+        elif self == Type.date_time:
             return 'dateTime'
         elif self == Type.number:
             return 'number'
