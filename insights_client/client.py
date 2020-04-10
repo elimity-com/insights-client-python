@@ -40,7 +40,7 @@ class BooleanValue:
 
     def model(self) -> dict:
         return {
-            'type': Type.boolean.model(),
+            'type': Type.BOOLEAN.model(),
             'value': 'true' if self.value else 'false'
         }
 
@@ -103,7 +103,7 @@ class DateValue:
 
     def model(self) -> dict:
         return {
-            'type': Type.date.model(),
+            'type': Type.DATE.model(),
             'value': '{:%Y-%m-%d}'.format(self.value)
         }
 
@@ -116,7 +116,7 @@ class DateTimeValue:
         value = self.value.astimezone(timezone.utc)
         value_str = '{:%Y-%m-%dT%H:%M:%S}Z'.format(value)
         return {
-            'type': Type.date_time.model(),
+            'type': Type.DATE_TIME.model(),
             'value': value_str
         }
 
@@ -160,7 +160,7 @@ class NumberValue:
 
     def model(self) -> dict:
         return {
-            'type': Type.number.model(),
+            'type': Type.NUMBER.model(),
             'value': '{}'.format(self.value)
         }
 
@@ -211,7 +211,7 @@ class TimeValue:
                             tzinfo=self.value.tzinfo)
         value_dt_utc = value_dt.astimezone(timezone.utc)
         return {
-            'type': Type.time.model(),
+            'type': Type.TIME.model(),
             'value': '{:%H:%M:%S}Z'.format(value_dt_utc)
         }
 
@@ -222,31 +222,31 @@ class StringValue:
 
     def model(self) -> dict:
         return {
-            'type': Type.string.model(),
+            'type': Type.STRING.model(),
             'value': self.value
         }
 
 
 class Type(Enum):
-    boolean = 1
-    date = 2
-    date_time = 3
-    number = 4
-    string = 5
-    time = 6
+    BOOLEAN = 1
+    DATE = 2
+    DATE_TIME = 3
+    NUMBER = 4
+    STRING = 5
+    TIME = 6
 
     def model(self) -> str:
-        if self == Type.boolean:
+        if self == Type.BOOLEAN:
             return 'boolean'
-        elif self == Type.date:
+        elif self == Type.DATE:
             return 'date'
-        elif self == Type.date_time:
+        elif self == Type.DATE_TIME:
             return 'dateTime'
-        elif self == Type.number:
+        elif self == Type.NUMBER:
             return 'number'
-        elif self == Type.string:
+        elif self == Type.STRING:
             return 'string'
-        elif self == Type.time:
+        elif self == Type.TIME:
             return 'time'
 
 

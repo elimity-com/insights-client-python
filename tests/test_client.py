@@ -25,7 +25,7 @@ class TestClient(TestCase):
     def test_create_attribute_type(self) -> None:
         attribute_type_input = AttributeType(entity_type='foo',
                                              name='bar',
-                                             type=Type.string,
+                                             type=Type.STRING,
                                              description='some description')
         self.elimity_client.create_attribute_type(attribute_type_input)
 
@@ -44,7 +44,7 @@ class TestClient(TestCase):
         relationship_attribute_type_input = RelationshipAttributeType(from_entity_type='foo',
                                                                       to_entity_type='bar',
                                                                       name='baz',
-                                                                      type=Type.string,
+                                                                      type=Type.STRING,
                                                                       description='some description')
         self.elimity_client.create_relationship_attribute_type(relationship_attribute_type_input)
 
