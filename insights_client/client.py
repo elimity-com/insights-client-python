@@ -52,8 +52,9 @@ class Client:
     def __init__(self, config: 'Config', disable_ssl_check: 'bool') -> None:
         self._config = config
         self._disable_ssl_check = disable_ssl_check
-        self._token = ''
         self.debug = config.debug
+        self._token = self._get_token()
+
         if config.debug:
             _enable_debug_logging()
 
