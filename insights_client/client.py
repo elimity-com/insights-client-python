@@ -7,13 +7,7 @@ from typing import List, Union
 import requests
 
 import http.client as http_client
-http_client.HTTPConnection.debuglevel = 2
 
-logging.basicConfig()
-logging.getLogger().setLevel(logging.DEBUG)
-requests_log = logging.getLogger("requests.packages.urllib3")
-requests_log.setLevel(logging.DEBUG)
-requests_log.propagate = True
 
 @dataclass
 class AttributeAssignment:
@@ -59,6 +53,9 @@ class Client:
         self._config = config
         self._disable_ssl_check = disable_ssl_check
         self._token = ''
+        self.debug = config.debug
+        if config.debug:
+            _enable_debug_logging()
 
     def create_attribute_type(self, attribute_type: AttributeType) -> None:
         body = attribute_type.model()
@@ -82,7 +79,8 @@ class Client:
                              verify=not self._disable_ssl_check,
                              json=body,
                              headers=headers)
-        print("response-body: " + resp.text)
+        if self.debug:
+            print("response-body: " + resp.text)
         resp.raise_for_status()
 
     def _access_token(self) -> str:
@@ -97,8 +95,19 @@ class Client:
                              verify=not self._disable_ssl_check,
                              json=body)
         resp.raise_for_status()
-        print("response-body: " + resp.text)
+        if self.debug:
+            print("response-body: " + resp.text)
         return resp.json()['token']
+
+
+def _enable_debug_logging():
+    http_client.HTTPConnection.debuglevel = 2
+
+    logging.basicConfig()
+    logging.getLogger().setLevel(logging.DEBUG)
+    requests_log = logging.getLogger("requests.packages.urllib3")
+    requests_log.setLevel(logging.DEBUG)
+    requests_log.propagate = True
 
 
 @dataclass
@@ -106,6 +115,7 @@ class Config:
     password: str
     username: str
     url: str
+    debug: bool
 
 
 @dataclass
@@ -185,9 +195,9 @@ class Relationship:
     to_entity_type: str
 
     def model(self) -> dict:
-        attributeAssignments = list(map(AttributeAssignment.model, self.attribute_assignments))
+        attribute_assignments = list(map(AttributeAssignment.model, self.attribute_assignments))
         return {
-            'attributeAssignments': attributeAssignments,
+            'attributeAssignments': attribute_assignments,
             'fromId': self.from_entity_id,
             'toId': self.to_entity_id,
             'fromType': self.from_entity_type,
