@@ -1,3 +1,4 @@
+import logging
 from dataclasses import dataclass
 from datetime import datetime, time, date, timezone
 from enum import Enum
@@ -5,6 +6,14 @@ from typing import List, Union
 
 import requests
 
+import http.client as http_client
+http_client.HTTPConnection.debuglevel = 2
+
+logging.basicConfig()
+logging.getLogger().setLevel(logging.DEBUG)
+requests_log = logging.getLogger("requests.packages.urllib3")
+requests_log.setLevel(logging.DEBUG)
+requests_log.propagate = True
 
 @dataclass
 class AttributeAssignment:
@@ -73,6 +82,7 @@ class Client:
                              verify=not self._disable_ssl_check,
                              json=body,
                              headers=headers)
+        print("response-body: " + resp.text)
         resp.raise_for_status()
 
     def _access_token(self) -> str:
@@ -87,6 +97,7 @@ class Client:
                              verify=not self._disable_ssl_check,
                              json=body)
         resp.raise_for_status()
+        print("response-body: " + resp.text)
         return resp.json()['token']
 
 
