@@ -109,7 +109,10 @@ class DateTimeValue:
     value: datetime
 
     def model(self) -> dict:
-        value = self.value.astimezone(timezone.utc)
+        try:
+            value = self.value.astimezone(timezone.utc)
+        except OSError:
+            value = self.value
         value_str = '{:%Y-%m-%dT%H:%M:%S}Z'.format(value)
         return {
             'type': 'dateTime',
