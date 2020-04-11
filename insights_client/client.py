@@ -5,6 +5,7 @@ from enum import Enum
 from typing import List, Union
 
 import requests
+import urllib3
 
 import http.client as http_client
 
@@ -57,6 +58,9 @@ class Client:
 
         if config.debug:
             _enable_debug_logging()
+
+        if disable_ssl_check:
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
     def create_attribute_type(self, attribute_type: AttributeType) -> None:
         body = attribute_type.model()
