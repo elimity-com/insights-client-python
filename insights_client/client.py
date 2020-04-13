@@ -139,7 +139,17 @@ class DateTimeValue:
     value: datetime
 
     def model(self) -> dict:
-        value_str = str(self.value)
+        # dt.astimezone() contains a bug on Windows it seems, see https://bugs.python.org/issue36759
+        # The following should work according to that bug report.
+        sv = self.value
+        value = datetime(year=sv.year,
+                         month=sv.month,
+                         day=sv.day,
+                         hour=sv.hour,
+                         minute=sv.minute,
+                         second=sv.second,
+                         tzinfo=timezone.utc)
+        value_str = '{:%Y-%m-%d %H:%M:%S}'.format(value)
         return {
             'type': Type.DATE_TIME.model(),
             'value': value_str
