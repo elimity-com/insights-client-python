@@ -89,8 +89,6 @@ class Client:
         resp.raise_for_status()
 
     def _access_token(self) -> str:
-        if self._token == '':
-            self._token = self._get_token()
         return self._token
 
     def _get_token(self) -> str:
