@@ -53,8 +53,7 @@ class Client:
     def __init__(self, config: 'Config', disable_ssl_check: 'bool') -> None:
         self._config = config
         self._disable_ssl_check = disable_ssl_check
-        self.debug = config.debug
-        self._token = self._get_token()
+        self._token = Client._get_token(config, disable_ssl_check)
 
         if config.debug:
             _enable_debug_logging()
@@ -71,6 +70,10 @@ class Client:
         body = relationship_attribute_type.model()
         path = 'relationshipAttributeTypes'
         self._post_request(path, body)
+
+    @property
+    def debug(self) -> bool:
+        return self._config.debug
 
     def reload_domain_graph(self, domain_graph: 'DomainGraph') -> None:
         body = domain_graph.model()
@@ -91,14 +94,15 @@ class Client:
     def _access_token(self) -> str:
         return self._token
 
-    def _get_token(self) -> str:
-        body = {'type': 'password', 'value': self._config.password}
-        url = '{}/authenticate/{}'.format(self._config.url, self._config.username)
+    @staticmethod
+    def _get_token(config: 'Config', disable_ssl_check: bool) -> str:
+        body = {'type': 'password', 'value': config.password}
+        url = '{}/authenticate/{}'.format(config.url, config.username)
         resp = requests.post(url,
-                             verify=not self._disable_ssl_check,
+                             verify=not disable_ssl_check,
                              json=body)
         resp.raise_for_status()
-        if self.debug:
+        if config.debug:
             print("response-body: " + resp.text)
         return resp.json()['token']
 
