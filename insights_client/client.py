@@ -82,7 +82,7 @@ class Client:
 
     def _post_request(self, path: 'str', body: 'dict') -> None:
         url = '{}/{}'.format(self._config.url, path)
-        headers = {'Authorization': 'Bearer {}'.format(self._access_token())}
+        headers = {'Authorization': 'Bearer {}'.format(self._token)}
         resp = requests.post(url,
                              verify=not self._disable_ssl_check,
                              json=body,
@@ -90,9 +90,6 @@ class Client:
         if self.debug:
             print("response-body: " + resp.text)
         resp.raise_for_status()
-
-    def _access_token(self) -> str:
-        return self._token
 
     @staticmethod
     def _get_token(config: 'Config', disable_ssl_check: bool) -> str:
