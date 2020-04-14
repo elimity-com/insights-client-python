@@ -1,7 +1,7 @@
 import logging
 from dataclasses import dataclass
 from datetime import datetime, time, date, timezone
-from enum import Enum
+from enum import Enum, auto
 from typing import List, Union
 
 import requests
@@ -257,12 +257,12 @@ class StringValue:
 
 
 class Type(Enum):
-    BOOLEAN = 1
-    DATE = 2
-    DATE_TIME = 3
-    NUMBER = 4
-    STRING = 5
-    TIME = 6
+    BOOLEAN = auto()
+    DATE = auto()
+    DATE_TIME = auto()
+    NUMBER = auto()
+    STRING = auto()
+    TIME = auto()
 
     def model(self) -> str:
         if self == Type.BOOLEAN:
