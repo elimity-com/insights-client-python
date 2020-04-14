@@ -15,7 +15,7 @@ class TestClient(TestCase):
         self._patch_get_token = patch('client.Client._get_token', return_value='token')
         self.post_request_mock = self._patch_post_request.start()
         self.get_token_mock = self._patch_get_token.start()
-        self.client_config = Config('password', 'user_name', 'api_url')
+        self.client_config = Config('password', 'user_name', 'api_url', False)
         self.elimity_client = ElimityClient(self.client_config, disable_ssl_check=True)
 
     def tearDown(self) -> None:
