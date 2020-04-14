@@ -72,7 +72,7 @@ class Client:
         self._post_request(path, body)
 
     @property
-    def debug(self) -> bool:
+    def _debug(self) -> bool:
         return self._config.debug
 
     def reload_domain_graph(self, domain_graph: 'DomainGraph') -> None:
@@ -87,7 +87,7 @@ class Client:
                              verify=not self._disable_ssl_check,
                              json=body,
                              headers=headers)
-        if self.debug:
+        if self._debug:
             print("response-body: " + resp.text)
         resp.raise_for_status()
 
