@@ -1,9 +1,13 @@
+import logging
 from dataclasses import dataclass
 from datetime import datetime, time, date, timezone
-from enum import Enum
+from enum import Enum, auto
 from typing import List, Union
 
 import requests
+import urllib3
+
+import http.client as http_client
 
 
 @dataclass
@@ -30,7 +34,7 @@ class AttributeType:
             'category': self.entity_type,
             'description': self.description,
             'name': self.name,
-            'type': self.type
+            'type': self.type.model()
         }
 
 
@@ -40,7 +44,7 @@ class BooleanValue:
 
     def model(self) -> dict:
         return {
-            'type': 'boolean',
+            'type': Type.BOOLEAN.model(),
             'value': 'true' if self.value else 'false'
         }
 
@@ -49,7 +53,13 @@ class Client:
     def __init__(self, config: 'Config', disable_ssl_check: 'bool') -> None:
         self._config = config
         self._disable_ssl_check = disable_ssl_check
-        self._access_token = self._get_token(config.password, config.user_name, config.url, disable_ssl_check)
+        self._token = Client._get_token(config, disable_ssl_check)
+
+        if config.debug:
+            _enable_debug_logging()
+
+        if disable_ssl_check:
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
     def create_attribute_type(self, attribute_type: AttributeType) -> None:
         body = attribute_type.model()
@@ -61,6 +71,10 @@ class Client:
         path = 'relationshipAttributeTypes'
         self._post_request(path, body)
 
+    @property
+    def _debug(self) -> bool:
+        return self._config.debug
+
     def reload_domain_graph(self, domain_graph: 'DomainGraph') -> None:
         body = domain_graph.model()
         path = 'domain-graph/reload'
@@ -68,29 +82,44 @@ class Client:
 
     def _post_request(self, path: 'str', body: 'dict') -> None:
         url = '{}/{}'.format(self._config.url, path)
-        headers = {'Authorization': 'Bearer {}'.format(self._access_token)}
+        headers = {'Authorization': 'Bearer {}'.format(self._token)}
         resp = requests.post(url,
                              verify=not self._disable_ssl_check,
                              json=body,
                              headers=headers)
+        if self._debug:
+            print("response-body: " + resp.text)
         resp.raise_for_status()
 
     @staticmethod
-    def _get_token(password: 'str', user_name: 'str', url: 'str', disable_ssl_check: 'bool') -> str:
-        body = {'type': 'password', 'value': password}
-        url = '{}/authenticate/{}'.format(url, user_name)
+    def _get_token(config: 'Config', disable_ssl_check: bool) -> str:
+        body = {'type': 'password', 'value': config.password}
+        url = '{}/authenticate/{}'.format(config.url, config.username)
         resp = requests.post(url,
                              verify=not disable_ssl_check,
                              json=body)
         resp.raise_for_status()
+        if config.debug:
+            print("response-body: " + resp.text)
         return resp.json()['token']
+
+
+def _enable_debug_logging():
+    http_client.HTTPConnection.debuglevel = 2
+
+    logging.basicConfig()
+    logging.getLogger().setLevel(logging.DEBUG)
+    requests_log = logging.getLogger("requests.packages.urllib3")
+    requests_log.setLevel(logging.DEBUG)
+    requests_log.propagate = True
 
 
 @dataclass
 class Config:
     password: str
-    user_name: str
+    username: str
     url: str
+    debug: bool
 
 
 @dataclass
@@ -99,7 +128,7 @@ class DateValue:
 
     def model(self) -> dict:
         return {
-            'type': 'date',
+            'type': Type.DATE.model(),
             'value': '{:%Y-%m-%d}'.format(self.value)
         }
 
@@ -109,10 +138,11 @@ class DateTimeValue:
     value: datetime
 
     def model(self) -> dict:
+        # IMPORTANT: dt.astimezone() contains a bug on Windows it seems, see https://bugs.python.org/issue36759
         value = self.value.astimezone(timezone.utc)
         value_str = '{:%Y-%m-%dT%H:%M:%S}Z'.format(value)
         return {
-            'type': 'dateTime',
+            'type': Type.DATE_TIME.model(),
             'value': value_str
         }
 
@@ -156,7 +186,7 @@ class NumberValue:
 
     def model(self) -> dict:
         return {
-            'type': 'number',
+            'type': Type.NUMBER.model(),
             'value': '{}'.format(self.value)
         }
 
@@ -170,9 +200,9 @@ class Relationship:
     to_entity_type: str
 
     def model(self) -> dict:
-        attributeAssignments = list(map(AttributeAssignment.model, self.attribute_assignments))
+        attribute_assignments = list(map(AttributeAssignment.model, self.attribute_assignments))
         return {
-            'attributeAssignments': attributeAssignments,
+            'attributeAssignments': attribute_assignments,
             'fromId': self.from_entity_id,
             'toId': self.to_entity_id,
             'fromType': self.from_entity_type,
@@ -207,7 +237,7 @@ class TimeValue:
                             tzinfo=self.value.tzinfo)
         value_dt_utc = value_dt.astimezone(timezone.utc)
         return {
-            'type': 'time',
+            'type': Type.TIME.model(),
             'value': '{:%H:%M:%S}Z'.format(value_dt_utc)
         }
 
@@ -218,18 +248,32 @@ class StringValue:
 
     def model(self) -> dict:
         return {
-            'type': 'string',
+            'type': Type.STRING.model(),
             'value': self.value
         }
 
 
-class Type(str, Enum):
-    boolean = 1
-    date = 2
-    date_time = 3
-    number = 4
-    string = 5
-    time = 6
+class Type(Enum):
+    BOOLEAN = auto()
+    DATE = auto()
+    DATE_TIME = auto()
+    NUMBER = auto()
+    STRING = auto()
+    TIME = auto()
+
+    def model(self) -> str:
+        if self == Type.BOOLEAN:
+            return 'boolean'
+        elif self == Type.DATE:
+            return 'date'
+        elif self == Type.DATE_TIME:
+            return 'dateTime'
+        elif self == Type.NUMBER:
+            return 'number'
+        elif self == Type.STRING:
+            return 'string'
+        elif self == Type.TIME:
+            return 'time'
 
 
 Value = Union[BooleanValue, DateValue, DateTimeValue, NumberValue, StringValue, TimeValue]

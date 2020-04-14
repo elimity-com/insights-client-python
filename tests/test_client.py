@@ -15,7 +15,7 @@ class TestClient(TestCase):
         self._patch_get_token = patch('client.Client._get_token', return_value='token')
         self.post_request_mock = self._patch_post_request.start()
         self.get_token_mock = self._patch_get_token.start()
-        self.client_config = Config('password', 'user_name', 'api_url')
+        self.client_config = Config('password', 'user_name', 'api_url', False)
         self.elimity_client = ElimityClient(self.client_config, disable_ssl_check=True)
 
     def tearDown(self) -> None:
@@ -25,16 +25,16 @@ class TestClient(TestCase):
     def test_create_attribute_type(self) -> None:
         attribute_type_input = AttributeType(entity_type='foo',
                                              name='bar',
-                                             type=Type.string,
+                                             type=Type.STRING,
                                              description='some description')
         self.elimity_client.create_attribute_type(attribute_type_input)
 
         expected_url = self.client_config.url + '/attributeTypes'
         expected_json = {
-            'category': attribute_type_input.entity_type,
-            'description': attribute_type_input.description,
-            'name': attribute_type_input.name,
-            'type': attribute_type_input.type
+            'category': 'foo',
+            'description': 'some description',
+            'name': 'bar',
+            'type': 'string'
         }
         expected_headers = {'Authorization': 'Bearer token'}
         self.post_request_mock.assert_called_with(expected_url, headers=expected_headers, verify=False,
@@ -44,7 +44,7 @@ class TestClient(TestCase):
         relationship_attribute_type_input = RelationshipAttributeType(from_entity_type='foo',
                                                                       to_entity_type='bar',
                                                                       name='baz',
-                                                                      type=Type.string,
+                                                                      type=Type.STRING,
                                                                       description='some description')
         self.elimity_client.create_relationship_attribute_type(relationship_attribute_type_input)
 
