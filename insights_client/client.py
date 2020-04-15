@@ -3,22 +3,72 @@ import logging
 from dataclasses import dataclass
 from datetime import datetime, time, date, timezone
 from enum import Enum, auto
-from typing import List, Union
+from io import DEFAULT_BUFFER_SIZE
+from json import JSONEncoder
+from typing import List, Union, Iterable
 
 import requests
 import urllib3
+
+
+class _DomainGraphEncoder(JSONEncoder):
+    def default(self, o):
+        if isinstance(o, AttributeAssignment):
+            return {"attributeTypeName": o.attribute_type_name, "value": o.value}
+        elif isinstance(o, BooleanValue):
+            return {"type": "boolean", "value": "true" if o.value else "false"}
+        elif isinstance(o, DateValue):
+            value = "{:%Y-%m-%d}".format(o.value)
+            return {"type": "date", "value": value}
+        elif isinstance(o, DateTimeValue):
+            # FIXME does not work on Windows, see https://bugs.python.org/issue36759
+            utc_value = o.value.astimezone(timezone.utc)
+            value = "{:%Y-%m-%dT%H:%M:%S}Z".format(utc_value)
+            return {"type": "dateTime", "value": value}
+        elif isinstance(o, DomainGraph):
+            return {"entities": o.entities, "relationships": o.relationships}
+        elif isinstance(o, Entity):
+            return {
+                "active": o.active,
+                "attributeAssignments": o.attribute_assignments,
+                "id": o.id,
+                "name": o.name,
+                "type": o.type,
+            }
+        elif isinstance(o, NumberValue):
+            value = "{}".format(o.value)
+            return {"type": "number", "value": value}
+        elif isinstance(o, Relationship):
+            return {
+                "attributeAssignments": o.attribute_assignments,
+                "fromId": o.from_entity_id,
+                "toId": o.to_entity_id,
+                "fromType": o.from_entity_type,
+                "toType": o.to_entity_type,
+            }
+        elif isinstance(o, StringValue):
+            return {"type": "string", "value": o.value}
+        elif isinstance(o, TimeValue):
+            dt_value = datetime(
+                2000,
+                1,
+                1,
+                o.value.hour,
+                o.value.minute,
+                o.value.second,
+                tzinfo=o.value.tzinfo,
+            )
+            utc_dt_value = dt_value.astimezone(timezone.utc)
+            value = "{:%H:%M:%S}Z".format(utc_dt_value)
+            return {"type": "time", "value": value}
+        else:
+            return JSONEncoder.default(self, o)
 
 
 @dataclass
 class AttributeAssignment:
     attribute_type_name: str
     value: "Value"
-
-    def model(self) -> dict:
-        return {
-            "attributeTypeName": self.attribute_type_name,
-            "value": self.value.model(),
-        }
 
 
 @dataclass
@@ -40,12 +90,6 @@ class AttributeType:
 @dataclass
 class BooleanValue:
     value: bool
-
-    def model(self) -> dict:
-        return {
-            "type": Type.BOOLEAN.model(),
-            "value": "true" if self.value else "false",
-        }
 
 
 class Client:
@@ -77,16 +121,19 @@ class Client:
         return self._config.debug
 
     def reload_domain_graph(self, domain_graph: "DomainGraph") -> None:
-        body = domain_graph.model()
         path = "domain-graph/reload"
-        self._post_request(path, body)
+        body = _stream_domain_graph(domain_graph)
+        self._post_request(path, body, stream=True)
 
-    def _post_request(self, path: "str", body: "dict") -> None:
+    def _post_request(self, path: "str", body, stream=False) -> None:
         url = "{}/{}".format(self._config.url, path)
-        headers = {"Authorization": "Bearer {}".format(self._token)}
+        authorization = "Bearer {}".format(self._token)
+        headers = {"Authorization": authorization, "Content-Type": "application/json"}
+        kwargs = {"data": body} if stream else {"json": body}
         resp = requests.post(
-            url, verify=not self._disable_ssl_check, json=body, headers=headers
+            url, verify=not self._disable_ssl_check, headers=headers, **kwargs
         )
+
         if self._debug:
             print("response-body: " + resp.text)
         resp.raise_for_status()
@@ -113,30 +160,16 @@ class Config:
 class DateValue:
     value: date
 
-    def model(self) -> dict:
-        return {"type": Type.DATE.model(), "value": "{:%Y-%m-%d}".format(self.value)}
-
 
 @dataclass
 class DateTimeValue:
     value: datetime
-
-    def model(self) -> dict:
-        # IMPORTANT: dt.astimezone() contains a bug on Windows it seems, see https://bugs.python.org/issue36759
-        value = self.value.astimezone(timezone.utc)
-        value_str = "{:%Y-%m-%dT%H:%M:%S}Z".format(value)
-        return {"type": Type.DATE_TIME.model(), "value": value_str}
 
 
 @dataclass
 class DomainGraph:
     entities: List["Entity"]
     relationships: List["Relationship"]
-
-    def model(self) -> dict:
-        entities = list(map(Entity.model, self.entities))
-        relationships = list(map(Relationship.model, self.relationships))
-        return {"entities": entities, "relationships": relationships}
 
 
 @dataclass
@@ -147,25 +180,10 @@ class Entity:
     name: str
     type: str
 
-    def model(self) -> dict:
-        attribute_assignments = list(
-            map(AttributeAssignment.model, self.attribute_assignments)
-        )
-        return {
-            "active": self.active,
-            "attributeAssignments": attribute_assignments,
-            "id": self.id,
-            "name": self.name,
-            "type": self.type,
-        }
-
 
 @dataclass
 class NumberValue:
     value: float
-
-    def model(self) -> dict:
-        return {"type": Type.NUMBER.model(), "value": "{}".format(self.value)}
 
 
 @dataclass
@@ -175,18 +193,6 @@ class Relationship:
     from_entity_type: str
     to_entity_id: str
     to_entity_type: str
-
-    def model(self) -> dict:
-        attribute_assignments = list(
-            map(AttributeAssignment.model, self.attribute_assignments)
-        )
-        return {
-            "attributeAssignments": attribute_assignments,
-            "fromId": self.from_entity_id,
-            "toId": self.to_entity_id,
-            "fromType": self.from_entity_type,
-            "toType": self.to_entity_type,
-        }
 
 
 @dataclass
@@ -211,26 +217,10 @@ class RelationshipAttributeType:
 class TimeValue:
     value: time
 
-    def model(self) -> dict:
-        value_dt = datetime(
-            2000,
-            1,
-            1,
-            self.value.hour,
-            self.value.minute,
-            self.value.second,
-            tzinfo=self.value.tzinfo,
-        )
-        value_dt_utc = value_dt.astimezone(timezone.utc)
-        return {"type": Type.TIME.model(), "value": "{:%H:%M:%S}Z".format(value_dt_utc)}
-
 
 @dataclass
 class StringValue:
     value: str
-
-    def model(self) -> dict:
-        return {"type": Type.STRING.model(), "value": self.value}
 
 
 class Type(Enum):
@@ -259,3 +249,18 @@ class Type(Enum):
 Value = Union[
     BooleanValue, DateValue, DateTimeValue, NumberValue, StringValue, TimeValue
 ]
+
+
+def _stream_domain_graph(domain_graph: DomainGraph) -> Iterable[bytes]:
+    encoder = _DomainGraphEncoder()
+    buffer = bytearray()
+
+    for chunk in encoder.iterencode(domain_graph):
+        chunk_bytes = chunk.encode()
+        buffer.extend(chunk_bytes)
+
+        if len(buffer) > DEFAULT_BUFFER_SIZE:
+            yield bytes(buffer)
+            buffer.clear()
+
+    yield bytes(buffer)
