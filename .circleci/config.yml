@@ -1,0 +1,10 @@
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.7
+    steps:
+      - checkout
+      - run: pipenv install --dev
+      - run: pipenv run black --check .
+
+version: 2.1

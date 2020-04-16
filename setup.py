@@ -7,10 +7,10 @@ setuptools.setup(
     author_email="tom@elimity.com",
     description="Client acting as a wrapper of the Elimity Insights API which can be used by import scripts.",
     url="https://github.com/elimity-com/insights-client-python",
-    packages=['insights_client'],
+    packages=["insights_client"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.6',
+    python_requires=">=3.6",
 )

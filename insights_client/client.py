@@ -12,12 +12,12 @@ import urllib3
 @dataclass
 class AttributeAssignment:
     attribute_type_name: str
-    value: 'Value'
+    value: "Value"
 
     def model(self) -> dict:
         return {
-            'attributeTypeName': self.attribute_type_name,
-            'value': self.value.model()
+            "attributeTypeName": self.attribute_type_name,
+            "value": self.value.model(),
         }
 
 
@@ -25,15 +25,15 @@ class AttributeAssignment:
 class AttributeType:
     entity_type: str
     name: str
-    type: 'Type'
+    type: "Type"
     description: str
 
     def model(self) -> dict:
         return {
-            'category': self.entity_type,
-            'description': self.description,
-            'name': self.name,
-            'type': self.type.model()
+            "category": self.entity_type,
+            "description": self.description,
+            "name": self.name,
+            "type": self.type.model(),
         }
 
 
@@ -43,13 +43,13 @@ class BooleanValue:
 
     def model(self) -> dict:
         return {
-            'type': Type.BOOLEAN.model(),
-            'value': 'true' if self.value else 'false'
+            "type": Type.BOOLEAN.model(),
+            "value": "true" if self.value else "false",
         }
 
 
 class Client:
-    def __init__(self, config: 'Config', disable_ssl_check: 'bool') -> None:
+    def __init__(self, config: "Config", disable_ssl_check: "bool") -> None:
         self._config = config
         self._disable_ssl_check = disable_ssl_check
         self._token = config.token
@@ -62,30 +62,31 @@ class Client:
 
     def create_attribute_type(self, attribute_type: AttributeType) -> None:
         body = attribute_type.model()
-        path = 'attributeTypes'
+        path = "attributeTypes"
         self._post_request(path, body)
 
-    def create_relationship_attribute_type(self, relationship_attribute_type: 'RelationshipAttributeType') -> None:
+    def create_relationship_attribute_type(
+        self, relationship_attribute_type: "RelationshipAttributeType"
+    ) -> None:
         body = relationship_attribute_type.model()
-        path = 'relationshipAttributeTypes'
+        path = "relationshipAttributeTypes"
         self._post_request(path, body)
 
     @property
     def _debug(self) -> bool:
         return self._config.debug
 
-    def reload_domain_graph(self, domain_graph: 'DomainGraph') -> None:
+    def reload_domain_graph(self, domain_graph: "DomainGraph") -> None:
         body = domain_graph.model()
-        path = 'domain-graph/reload'
+        path = "domain-graph/reload"
         self._post_request(path, body)
 
-    def _post_request(self, path: 'str', body: 'dict') -> None:
-        url = '{}/{}'.format(self._config.url, path)
-        headers = {'Authorization': 'Bearer {}'.format(self._token)}
-        resp = requests.post(url,
-                             verify=not self._disable_ssl_check,
-                             json=body,
-                             headers=headers)
+    def _post_request(self, path: "str", body: "dict") -> None:
+        url = "{}/{}".format(self._config.url, path)
+        headers = {"Authorization": "Bearer {}".format(self._token)}
+        resp = requests.post(
+            url, verify=not self._disable_ssl_check, json=body, headers=headers
+        )
         if self._debug:
             print("response-body: " + resp.text)
         resp.raise_for_status()
@@ -113,10 +114,7 @@ class DateValue:
     value: date
 
     def model(self) -> dict:
-        return {
-            'type': Type.DATE.model(),
-            'value': '{:%Y-%m-%d}'.format(self.value)
-        }
+        return {"type": Type.DATE.model(), "value": "{:%Y-%m-%d}".format(self.value)}
 
 
 @dataclass
@@ -126,25 +124,19 @@ class DateTimeValue:
     def model(self) -> dict:
         # IMPORTANT: dt.astimezone() contains a bug on Windows it seems, see https://bugs.python.org/issue36759
         value = self.value.astimezone(timezone.utc)
-        value_str = '{:%Y-%m-%dT%H:%M:%S}Z'.format(value)
-        return {
-            'type': Type.DATE_TIME.model(),
-            'value': value_str
-        }
+        value_str = "{:%Y-%m-%dT%H:%M:%S}Z".format(value)
+        return {"type": Type.DATE_TIME.model(), "value": value_str}
 
 
 @dataclass
 class DomainGraph:
-    entities: List['Entity']
-    relationships: List['Relationship']
+    entities: List["Entity"]
+    relationships: List["Relationship"]
 
     def model(self) -> dict:
         entities = list(map(Entity.model, self.entities))
         relationships = list(map(Relationship.model, self.relationships))
-        return {
-            'entities': entities,
-            'relationships': relationships
-        }
+        return {"entities": entities, "relationships": relationships}
 
 
 @dataclass
@@ -156,13 +148,15 @@ class Entity:
     type: str
 
     def model(self) -> dict:
-        attribute_assignments = list(map(AttributeAssignment.model, self.attribute_assignments))
+        attribute_assignments = list(
+            map(AttributeAssignment.model, self.attribute_assignments)
+        )
         return {
-            'active': self.active,
-            'attributeAssignments': attribute_assignments,
-            'id': self.id,
-            'name': self.name,
-            'type': self.type
+            "active": self.active,
+            "attributeAssignments": attribute_assignments,
+            "id": self.id,
+            "name": self.name,
+            "type": self.type,
         }
 
 
@@ -171,10 +165,7 @@ class NumberValue:
     value: float
 
     def model(self) -> dict:
-        return {
-            'type': Type.NUMBER.model(),
-            'value': '{}'.format(self.value)
-        }
+        return {"type": Type.NUMBER.model(), "value": "{}".format(self.value)}
 
 
 @dataclass
@@ -186,13 +177,15 @@ class Relationship:
     to_entity_type: str
 
     def model(self) -> dict:
-        attribute_assignments = list(map(AttributeAssignment.model, self.attribute_assignments))
+        attribute_assignments = list(
+            map(AttributeAssignment.model, self.attribute_assignments)
+        )
         return {
-            'attributeAssignments': attribute_assignments,
-            'fromId': self.from_entity_id,
-            'toId': self.to_entity_id,
-            'fromType': self.from_entity_type,
-            'toType': self.to_entity_type
+            "attributeAssignments": attribute_assignments,
+            "fromId": self.from_entity_id,
+            "toId": self.to_entity_id,
+            "fromType": self.from_entity_type,
+            "toType": self.to_entity_type,
         }
 
 
@@ -201,16 +194,16 @@ class RelationshipAttributeType:
     from_entity_type: str
     name: str
     to_entity_type: str
-    type: 'Type'
+    type: "Type"
     description: str
 
     def model(self) -> dict:
         return {
-            'childType': self.to_entity_type,
-            'description': self.description,
-            'name': self.name,
-            'parentType': self.from_entity_type,
-            'type': self.type
+            "childType": self.to_entity_type,
+            "description": self.description,
+            "name": self.name,
+            "parentType": self.from_entity_type,
+            "type": self.type,
         }
 
 
@@ -219,13 +212,17 @@ class TimeValue:
     value: time
 
     def model(self) -> dict:
-        value_dt = datetime(2000, 1, 1, self.value.hour, self.value.minute, self.value.second,
-                            tzinfo=self.value.tzinfo)
+        value_dt = datetime(
+            2000,
+            1,
+            1,
+            self.value.hour,
+            self.value.minute,
+            self.value.second,
+            tzinfo=self.value.tzinfo,
+        )
         value_dt_utc = value_dt.astimezone(timezone.utc)
-        return {
-            'type': Type.TIME.model(),
-            'value': '{:%H:%M:%S}Z'.format(value_dt_utc)
-        }
+        return {"type": Type.TIME.model(), "value": "{:%H:%M:%S}Z".format(value_dt_utc)}
 
 
 @dataclass
@@ -233,10 +230,7 @@ class StringValue:
     value: str
 
     def model(self) -> dict:
-        return {
-            'type': Type.STRING.model(),
-            'value': self.value
-        }
+        return {"type": Type.STRING.model(), "value": self.value}
 
 
 class Type(Enum):
@@ -249,17 +243,19 @@ class Type(Enum):
 
     def model(self) -> str:
         if self == Type.BOOLEAN:
-            return 'boolean'
+            return "boolean"
         elif self == Type.DATE:
-            return 'date'
+            return "date"
         elif self == Type.DATE_TIME:
-            return 'dateTime'
+            return "dateTime"
         elif self == Type.NUMBER:
-            return 'number'
+            return "number"
         elif self == Type.STRING:
-            return 'string'
+            return "string"
         elif self == Type.TIME:
-            return 'time'
+            return "time"
 
 
-Value = Union[BooleanValue, DateValue, DateTimeValue, NumberValue, StringValue, TimeValue]
+Value = Union[
+    BooleanValue, DateValue, DateTimeValue, NumberValue, StringValue, TimeValue
+]
