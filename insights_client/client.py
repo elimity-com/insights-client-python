@@ -1,3 +1,4 @@
+import http.client as http_client
 import logging
 from dataclasses import dataclass
 from datetime import datetime, time, date, timezone
@@ -6,8 +7,6 @@ from typing import List, Union
 
 import requests
 import urllib3
-
-import http.client as http_client
 
 
 @dataclass
@@ -53,7 +52,7 @@ class Client:
     def __init__(self, config: 'Config', disable_ssl_check: 'bool') -> None:
         self._config = config
         self._disable_ssl_check = disable_ssl_check
-        self._token = Client._get_token(config, disable_ssl_check)
+        self._token = config.token
 
         if config.debug:
             _enable_debug_logging()
@@ -91,18 +90,6 @@ class Client:
             print("response-body: " + resp.text)
         resp.raise_for_status()
 
-    @staticmethod
-    def _get_token(config: 'Config', disable_ssl_check: bool) -> str:
-        body = {'type': 'password', 'value': config.password}
-        url = '{}/authenticate/{}'.format(config.url, config.username)
-        resp = requests.post(url,
-                             verify=not disable_ssl_check,
-                             json=body)
-        resp.raise_for_status()
-        if config.debug:
-            print("response-body: " + resp.text)
-        return resp.json()['token']
-
 
 def _enable_debug_logging():
     http_client.HTTPConnection.debuglevel = 2
@@ -116,8 +103,7 @@ def _enable_debug_logging():
 
 @dataclass
 class Config:
-    password: str
-    username: str
+    token: str
     url: str
     debug: bool
 
