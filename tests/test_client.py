@@ -2,7 +2,8 @@ import datetime
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 
-from insights_client.client import Client as ElimityClient, Config, AttributeType, Type, DomainGraph, Entity, Relationship, \
+from insights_client.client import Client as ElimityClient, Config, AttributeType, Type, DomainGraph, Entity, \
+    Relationship, \
     AttributeAssignment, BooleanValue, DateTimeValue, TimeValue, DateValue, NumberValue, StringValue, \
     RelationshipAttributeType
 
@@ -12,15 +13,12 @@ class TestClient(TestCase):
     def setUp(self) -> None:
         ElimityClient._get_token = MagicMock(return_value='token')
         self._patch_post_request = patch('requests.post')
-        self._patch_get_token = patch('client.Client._get_token', return_value='token')
         self.post_request_mock = self._patch_post_request.start()
-        self.get_token_mock = self._patch_get_token.start()
-        self.client_config = Config('password', 'user_name', 'api_url', False)
+        self.client_config = Config('token', 'api_url', False)
         self.elimity_client = ElimityClient(self.client_config, disable_ssl_check=True)
 
     def tearDown(self) -> None:
         self._patch_post_request.stop()
-        self._patch_get_token.stop()
 
     def test_create_attribute_type(self) -> None:
         attribute_type_input = AttributeType(entity_type='foo',
