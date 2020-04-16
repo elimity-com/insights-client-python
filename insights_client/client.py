@@ -1,3 +1,4 @@
+import http.client as http_client
 import logging
 from dataclasses import dataclass
 from datetime import datetime, time, date, timezone
@@ -6,8 +7,6 @@ from typing import List, Union
 
 import requests
 import urllib3
-
-import http.client as http_client
 
 
 @dataclass
@@ -64,7 +63,7 @@ class Client:
     def create_attribute_type(self, attribute_type: AttributeType) -> None:
         body = attribute_type.model()
         path = 'attributeTypes'
-        self._post_request(path, body)
+        self._post_attribute_creation_request_and_ignore_400(path, body, attribute_type)
 
     def create_relationship_attribute_type(self, relationship_attribute_type: 'RelationshipAttributeType') -> None:
         body = relationship_attribute_type.model()
@@ -90,6 +89,25 @@ class Client:
         if self._debug:
             print("response-body: " + resp.text)
         resp.raise_for_status()
+
+    def _post_attribute_creation_request_and_ignore_400(self, path: 'str', body: 'dict',
+                                                        attribute_type: AttributeType) -> None:
+        url = '{}/{}'.format(self._config.url, path)
+        headers = {'Authorization': 'Bearer {}'.format(self._token)}
+        resp = requests.post(url,
+                             verify=not self._disable_ssl_check,
+                             json=body,
+                             headers=headers)
+        if self._debug:
+            print("response-body: " + resp.text)
+
+        if resp.status_code == 400:
+            print(
+                "got a bad request response when creating attribute type {}; ignoring this by assuming {} already "
+                "exists".format(
+                    attribute_type.name, attribute_type.name))
+        else:
+            resp.raise_for_status()
 
     @staticmethod
     def _get_token(config: 'Config', disable_ssl_check: bool) -> str:
