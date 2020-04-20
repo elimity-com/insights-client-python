@@ -76,7 +76,12 @@ class _Handler(BaseHTTPRequestHandler):
             ],
             "relationships": [
                 {
-                    "attributeAssignments": [],
+                    "attributeAssignments": [
+                        {
+                            "attributeTypeName": "foo",
+                            "value": {"type": "string", "value": "bar"},
+                        }
+                    ],
                     "fromId": "foo",
                     "fromType": "baz",
                     "toId": "bar",
@@ -154,7 +159,11 @@ class TestReloadDomainGraph(TestCase):
             ],
             relationships=[
                 Relationship(
-                    attribute_assignments=[],
+                    attribute_assignments=[
+                        AttributeAssignment(
+                            attribute_type_name="foo", value=StringValue("bar")
+                        ),
+                    ],
                     from_entity_id="foo",
                     from_entity_type="baz",
                     to_entity_id="bar",
