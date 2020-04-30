@@ -53,12 +53,12 @@ class _Handler(BaseHTTPRequestHandler):
             {
                 "level": "info",
                 "message": "Happy New Year!",
-                "timestamp": "2020-01-01T00:00:00Z",
+                "timestamp": "2020-01-01T00:00:00+00:00",
             },
             {
                 "level": "alert",
                 "message": "Spooky...",
-                "timestamp": "2020-10-31T23:55:00Z",
+                "timestamp": "2020-10-31T23:55:00+00:00",
             },
         ]
         actual = loads(buffer)
