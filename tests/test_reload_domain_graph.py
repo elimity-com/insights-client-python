@@ -45,7 +45,7 @@ class _Handler(BaseHTTPRequestHandler):
                             "attributeTypeName": "baq",
                             "value": {
                                 "type": "dateTime",
-                                "value": "2006-01-02T12:04:05Z",
+                                "value": "2006-01-02T12:04:05+00:00",
                             },
                         },
                         {

@@ -9,6 +9,8 @@ from typing import List, Union, Iterable, Any
 
 import requests
 import urllib3
+from dateutil.tz import tzlocal
+from dateutil.utils import default_tzinfo
 
 
 class _DomainGraphEncoder(JSONEncoder):
@@ -277,9 +279,9 @@ def _marshal_connector_log(log: ConnectorLog) -> Any:
 
 
 def _marshal_datetime(time: datetime) -> Any:
-    # FIXME does not work on Windows, see https://bugs.python.org/issue36759
-    t = time.astimezone(timezone.utc)
-    return "{:%Y-%m-%dT%H:%M:%S}Z".format(t)
+    tzinfo = tzlocal()
+    t = default_tzinfo(time, tzinfo)
+    return t.isoformat()
 
 
 def _marshal_level(level: Level) -> Any:

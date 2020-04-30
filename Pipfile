@@ -10,6 +10,7 @@ httpchunked = "*"
 [packages]
 requests = "*"
 urllib3 = "*"
+python-dateutil = "*"
 
 [requires]
 python_version = "3.7"
