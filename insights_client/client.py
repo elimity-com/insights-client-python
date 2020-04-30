@@ -5,7 +5,7 @@ from datetime import datetime, time, date, timezone
 from enum import Enum, auto
 from io import DEFAULT_BUFFER_SIZE
 from json import JSONEncoder
-from typing import List, Union, Iterable
+from typing import List, Union, Iterable, Any
 
 import requests
 import urllib3
@@ -21,9 +21,7 @@ class _DomainGraphEncoder(JSONEncoder):
             value = "{:%Y-%m-%d}".format(o.value)
             return {"type": "date", "value": value}
         elif isinstance(o, DateTimeValue):
-            # FIXME does not work on Windows, see https://bugs.python.org/issue36759
-            utc_value = o.value.astimezone(timezone.utc)
-            value = "{:%Y-%m-%dT%H:%M:%S}Z".format(utc_value)
+            value = _marshal_datetime(o.value)
             return {"type": "dateTime", "value": value}
         elif isinstance(o, DomainGraph):
             return {"entities": o.entities, "relationships": o.relationships}
@@ -109,6 +107,11 @@ class Client:
         path = "attributeTypes"
         self._post_request(path, body)
 
+    def create_connector_logs(self, logs: List["ConnectorLog"]) -> None:
+        model_iter = map(_marshal_connector_log, logs)
+        models = list(model_iter)
+        self._post_request("connectorLogs", models)
+
     def create_relationship_attribute_type(
         self, relationship_attribute_type: "RelationshipAttributeType"
     ) -> None:
@@ -157,6 +160,13 @@ class Config:
 
 
 @dataclass
+class ConnectorLog:
+    level: "Level"
+    message: str
+    timestamp: datetime
+
+
+@dataclass
 class DateValue:
     value: date
 
@@ -179,6 +189,11 @@ class Entity:
     id: str
     name: str
     type: str
+
+
+class Level(Enum):
+    ALERT = auto()
+    INFO = auto()
 
 
 @dataclass
@@ -249,6 +264,31 @@ class Type(Enum):
 Value = Union[
     BooleanValue, DateValue, DateTimeValue, NumberValue, StringValue, TimeValue
 ]
+
+
+def _marshal_connector_log(log: ConnectorLog) -> Any:
+    level = _marshal_level(log.level)
+    timestamp = _marshal_datetime(log.timestamp)
+    return {
+        "level": level,
+        "message": log.message,
+        "timestamp": timestamp,
+    }
+
+
+def _marshal_datetime(time: datetime) -> Any:
+    # FIXME does not work on Windows, see https://bugs.python.org/issue36759
+    t = time.astimezone(timezone.utc)
+    return "{:%Y-%m-%dT%H:%M:%S}Z".format(t)
+
+
+def _marshal_level(level: Level) -> Any:
+    if level == Level.ALERT:
+        return "alert"
+    elif level == Level.INFO:
+        return "info"
+    else:
+        raise ValueError("unreachable")
 
 
 def _stream_domain_graph(domain_graph: DomainGraph) -> Iterable[bytes]:
