@@ -1,3 +1,10 @@
+"""
+Client for connector interactions with an Elimity Insights server.
+
+Note that the client interprets timestamps without timezone information as
+being defined in the local system timezone.
+"""
+
 import http.client as http_client
 import logging
 from dataclasses import dataclass
