@@ -1,5 +1,5 @@
 jobs:
-  build:
+  linux:
     docker:
       - image: circleci/python:3.7
     steps:
@@ -8,4 +8,20 @@ jobs:
       - run: pipenv run black --check .
       - run: pipenv run python -m unittest
 
+  windows:
+    machine:
+      image: windows-server-2019-vs2019:stable
+      resource_class: windows.medium
+    steps:
+      - checkout
+      - run: pip install pipenv
+      - run: pipenv install --dev
+      - run: pipenv run python -m unittest
+
 version: 2.1
+
+workflows:
+  main:
+    jobs:
+      - linux
+      - windows
