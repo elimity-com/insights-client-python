@@ -13,6 +13,7 @@ from enum import Enum, auto
 from io import DEFAULT_BUFFER_SIZE
 from json import JSONEncoder
 from typing import List, Union, Iterable, Any
+from zlib import compressobj
 
 import requests
 import urllib3
@@ -135,13 +136,18 @@ class Client:
     def reload_domain_graph(self, domain_graph: "DomainGraph") -> None:
         path = "domain-graph/reload"
         body = _stream_domain_graph(domain_graph)
-        self._post_request(path, body, stream=True)
+        self._post_request(path, body, compressed_stream=True)
 
-    def _post_request(self, path: "str", body, stream=False) -> None:
+    def _post_request(self, path: "str", body, compressed_stream=False) -> None:
         url = "{}/{}".format(self._config.url, path)
         authorization = "Bearer {}".format(self._token)
-        headers = {"Authorization": authorization, "Content-Type": "application/json"}
-        kwargs = {"data": body} if stream else {"json": body}
+        content_encoding = {"Content-Encoding": "deflate"} if compressed_stream else {}
+        headers = {
+            "Authorization": authorization,
+            "Content-Type": "application/json",
+            **content_encoding,
+        }
+        kwargs = {"data": body} if compressed_stream else {"json": body}
         resp = requests.post(
             url, verify=not self._disable_ssl_check, headers=headers, **kwargs
         )
@@ -303,13 +309,18 @@ def _marshal_level(level: Level) -> Any:
 def _stream_domain_graph(domain_graph: DomainGraph) -> Iterable[bytes]:
     encoder = _DomainGraphEncoder()
     buffer = bytearray()
+    compress = compressobj()
 
     for chunk in encoder.iterencode(domain_graph):
         chunk_bytes = chunk.encode()
-        buffer.extend(chunk_bytes)
+        compressed = compress.compress(chunk_bytes)
+        buffer.extend(compressed)
 
         if len(buffer) > DEFAULT_BUFFER_SIZE:
             yield bytes(buffer)
             buffer.clear()
 
-    yield bytes(buffer)
+    compressed = compress.flush()
+    buffer.extend(compressed)
+    if len(buffer) > 0:
+        yield bytes(buffer)

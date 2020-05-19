@@ -2,9 +2,10 @@ from datetime import time, timezone, datetime
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from io import BytesIO
-from json import load
+from json import loads
 from threading import Thread
 from unittest import TestCase
+from zlib import decompress
 
 from httpchunked import decode
 
@@ -92,8 +93,9 @@ class _Handler(BaseHTTPRequestHandler):
 
         buffer = BytesIO()
         decode(buffer, self.rfile)
-        buffer.seek(0)
-        actual = load(buffer)
+        raw = buffer.getvalue()
+        decompressed = decompress(raw)
+        actual = loads(decompressed)
 
         status = HTTPStatus.OK if expected == actual else HTTPStatus.BAD_REQUEST
         self.send_response(status)
