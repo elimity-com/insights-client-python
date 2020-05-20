@@ -239,7 +239,7 @@ class RelationshipAttributeType:
             "description": self.description,
             "name": self.name,
             "parentType": self.from_entity_type,
-            "type": self.type,
+            "type": self.type.model(),
         }
 
 
