@@ -58,11 +58,11 @@ class TestClient(TestCase):
 
         expected_url = self.client_config.url + "/relationshipAttributeTypes"
         expected_json = {
-            "childType": relationship_attribute_type_input.to_entity_type,
-            "description": relationship_attribute_type_input.description,
-            "name": relationship_attribute_type_input.name,
-            "parentType": relationship_attribute_type_input.from_entity_type,
-            "type": relationship_attribute_type_input.type,
+            "childType": "bar",
+            "description": "some description",
+            "name": "baz",
+            "parentType": "foo",
+            "type": "string",
         }
         expected_headers = {
             "Authorization": "Bearer token",
