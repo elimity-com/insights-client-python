@@ -89,6 +89,7 @@ class _Handler(BaseHTTPRequestHandler):
                     "toType": "foo",
                 }
             ],
+            "historyTimestamp": "2001-02-03T04:05:06+00:00",
         }
 
         buffer = BytesIO()
@@ -172,6 +173,7 @@ class TestReloadDomainGraph(TestCase):
                     to_entity_type="foo",
                 )
             ],
+            timestamp=datetime(2001, 2, 3, 4, 5, 6, tzinfo=timezone.utc),
         )
 
         client.reload_domain_graph(domain_graph)
