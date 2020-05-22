@@ -12,7 +12,7 @@ from datetime import datetime, time, date, timezone
 from enum import Enum, auto
 from io import DEFAULT_BUFFER_SIZE
 from json import JSONEncoder
-from typing import List, Union, Iterable, Any
+from typing import List, Union, Iterable, Any, Optional
 from zlib import compressobj
 
 import requests
@@ -34,7 +34,12 @@ class _DomainGraphEncoder(JSONEncoder):
             value = _marshal_datetime(o.value)
             return {"type": "dateTime", "value": value}
         elif isinstance(o, DomainGraph):
-            return {"entities": o.entities, "relationships": o.relationships}
+            timestamp = _marshal_domain_graph_timestamp(o.timestamp)
+            return {
+                "entities": o.entities,
+                "relationships": o.relationships,
+                **timestamp,
+            }
         elif isinstance(o, Entity):
             return {
                 "active": o.active,
@@ -195,6 +200,7 @@ class DateTimeValue:
 class DomainGraph:
     entities: List["Entity"]
     relationships: List["Relationship"]
+    timestamp: Optional[datetime] = None
 
 
 @dataclass
@@ -295,6 +301,13 @@ def _marshal_datetime(time: datetime) -> Any:
     tzinfo = tzlocal()
     t = default_tzinfo(time, tzinfo)
     return t.isoformat()
+
+
+def _marshal_domain_graph_timestamp(timestamp: Optional[datetime]) -> Any:
+    if timestamp is None:
+        return {}
+    value = _marshal_datetime(timestamp)
+    return {"historyTimestamp": value}
 
 
 def _marshal_level(level: Level) -> Any:
