@@ -8,9 +8,7 @@ black = "*"
 httpchunked = "*"
 
 [packages]
-requests = "*"
-urllib3 = "*"
-python-dateutil = "*"
+elimity-insights-client = {editable = true,path = "."}
 
 [requires]
 python_version = "3.7"
