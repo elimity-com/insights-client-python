@@ -21,12 +21,16 @@ from requests import post
 
 @dataclass
 class AttributeAssignment:
+    """Assignment of a value for an attribute type."""
+
     attribute_type_name: str
     value: "Value"
 
 
 @dataclass
 class AttributeType:
+    """Attribute type for an entity type."""
+
     description: str
     entity_type: str
     name: str
@@ -35,18 +39,25 @@ class AttributeType:
 
 @dataclass
 class BooleanValue:
+    """Value to assign for a boolean attribute type."""
+
     value: bool
 
 
 class Client:
+    """Client for connector interactions with an Elimity Insights server."""
+
     def __init__(self, config: "Config") -> None:
+        """Return a new client with the given configuration."""
         self._config = config
 
     def create_attribute_type(self, type_: AttributeType) -> None:
+        """Create a new attribute type."""
         body = _encode_attribute_type(type_)
         self._post(body, "attributeTypes")
 
     def create_connector_logs(self, logs: List["ConnectorLog"]) -> None:
+        """Create connector logs."""
         body = map(_encode_connector_log, logs)
         body_ = list(body)
         self._post(body_, "connectorLogs")
@@ -54,10 +65,12 @@ class Client:
     def create_relationship_attribute_type(
         self, type_: "RelationshipAttributeType"
     ) -> None:
+        """Create a new relationship attribute type."""
         body = _encode_relationship_attribute_type(type_)
         self._post(body, "relationshipAttributeTypes")
 
     def reload_domain_graph(self, graph: "DomainGraph") -> None:
+        """Reload a domain graph."""
         body = _encode_domain_graph(graph)
         self._post(body, "domain-graph/reload")
 
@@ -76,6 +89,8 @@ class Client:
 
 @dataclass
 class Config:
+    """Configuration for an Elimity Insights client."""
+
     base_path: str
     token: str
     verify_ssl: bool = True
@@ -83,6 +98,8 @@ class Config:
 
 @dataclass
 class ConnectorLog:
+    """Log line produced by an Elimity Insights connector."""
+
     level: "Level"
     message: str
     timestamp: datetime
@@ -90,16 +107,22 @@ class ConnectorLog:
 
 @dataclass
 class DateTimeValue:
+    """Value to assign for a date-time attribute type."""
+
     value: datetime
 
 
 @dataclass
 class DateValue:
+    """Value to assign for a date attribute type."""
+
     value: date
 
 
 @dataclass
 class DomainGraph:
+    """Snapshot of a complete domain graph at a specific timestamp."""
+
     entities: List["Entity"]
     relationships: List["Relationship"]
     timestamp: Optional[datetime] = None
@@ -107,6 +130,8 @@ class DomainGraph:
 
 @dataclass
 class Entity:
+    """Entity of a specific type, including attribute assignments."""
+
     active: bool
     attribute_assignments: List[AttributeAssignment]
     id: str
@@ -115,17 +140,23 @@ class Entity:
 
 
 class Level(Enum):
+    """Severity level of an Elimity Insights connector log line."""
+
     ALERT = auto()
     INFO = auto()
 
 
 @dataclass
 class NumberValue:
+    """Value to assign for a number attribute type."""
+
     value: float
 
 
 @dataclass
 class Relationship:
+    """Relationship between two entities, including attribute assignments."""
+
     attribute_assignments: List[AttributeAssignment]
     from_entity_id: str
     from_entity_type: str
@@ -135,6 +166,8 @@ class Relationship:
 
 @dataclass
 class RelationshipAttributeType:
+    """Attribute type for relationships between entities of specific types."""
+
     description: str
     from_entity_type: str
     name: str
@@ -144,15 +177,21 @@ class RelationshipAttributeType:
 
 @dataclass
 class StringValue:
+    """Value to assign for a string attribute type."""
+
     value: str
 
 
 @dataclass
 class TimeValue:
+    """Value to assign for a time attribute type."""
+
     value: time
 
 
 class Type(Enum):
+    """Type of an attribute type, determining valid assignment values."""
+
     BOOLEAN = auto()
     DATE = auto()
     DATE_TIME = auto()

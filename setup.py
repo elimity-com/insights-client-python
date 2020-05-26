@@ -1,3 +1,5 @@
+"""Setup module for the Elimity Insights client."""
+
 from setuptools import setup
 
 _classifiers = [
