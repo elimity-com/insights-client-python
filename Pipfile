@@ -6,11 +6,10 @@ verify_ssl = true
 [dev-packages]
 black = "*"
 httpchunked = "*"
+pydocstyle = "*"
 
 [packages]
-requests = "*"
-urllib3 = "*"
-python-dateutil = "*"
+elimity-insights-client = {editable = true,path = "."}
 
 [requires]
 python_version = "3.7"

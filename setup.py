@@ -1,16 +1,30 @@
-import setuptools
+"""Setup module for the Elimity Insights client."""
 
-setuptools.setup(
-    name="Elimity Insights Python client",
-    version="0.0.1",
-    author="Elimity",
-    author_email="tom@elimity.com",
-    description="Client acting as a wrapper of the Elimity Insights API which can be used by import scripts.",
+from setuptools import setup
+
+_classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.6",
+]
+
+_install_requires = ["more-itertools", "python-dateutil", "requests"]
+
+with open("README.md") as file:
+    _long_description = file.read()
+
+setup(
+    author="Elimity development team",
+    author_email="dev@elimity.com",
+    classifiers=_classifiers,
+    description="Client for connector interactions with an Elimity Insights server",
+    install_requires=_install_requires,
+    license="Apache-2.0",
+    long_description=_long_description,
+    long_description_content_type="text/markdown",
+    name="elimity-insights-client",
+    python_requires=">=3.7",
+    py_modules=["elimity_insights_client"],
     url="https://github.com/elimity-com/insights-client-python",
-    packages=["insights_client"],
-    classifiers=[
-        "Programming Language :: Python :: 3",
-        "Operating System :: OS Independent",
-    ],
-    python_requires=">=3.6",
+    version="0.1.0",
 )
