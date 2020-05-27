@@ -93,7 +93,8 @@ class Client:
     def _post(self, body: Any, path: str) -> None:
         data = _encode(body)
         url = f"{self._config.base_path}/{path}"
-        authorization = f"Bearer {self._config.token}"
+        token = self._config.token
+        authorization = None if token is None else f"Bearer {token}"
         headers = {
             "Authorization": authorization,
             "Content-Encoding": "deflate",
@@ -108,7 +109,7 @@ class Config:
     """Configuration for an Elimity Insights client."""
 
     base_path: str
-    token: str
+    token: Optional[str]
     verify_ssl: bool = True
     certificate: Optional[Certificate] = None
 
