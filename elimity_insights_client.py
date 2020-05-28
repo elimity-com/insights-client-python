@@ -10,7 +10,7 @@ from enum import Enum, auto
 from io import DEFAULT_BUFFER_SIZE
 from itertools import chain
 from json import JSONEncoder
-from typing import List, Optional, Union, Any, Iterable
+from typing import List, Optional, Union, Any, Iterable, Tuple
 from zlib import compressobj
 
 from dateutil.tz import tzlocal
@@ -44,6 +44,14 @@ class BooleanValue:
     value: bool
 
 
+@dataclass
+class Certificate:
+    """Client side certificate for mTLS connections."""
+
+    certificate_path: str
+    private_key_path: str
+
+
 class Client:
     """Client for connector interactions with an Elimity Insights server."""
 
@@ -74,7 +82,16 @@ class Client:
         body = _encode_domain_graph(graph)
         self._post(body, "domain-graph/reload")
 
+    @property
+    def _cert(self) -> Optional[Tuple[str, str]]:
+        certificate = self._config.certificate
+        if certificate is None:
+            return None
+        else:
+            return certificate.certificate_path, certificate.private_key_path
+
     def _post(self, body: Any, path: str) -> None:
+        data = _encode(body)
         url = f"{self._config.base_path}/{path}"
         authorization = f"Bearer {self._config.token}"
         headers = {
@@ -82,8 +99,7 @@ class Client:
             "Content-Encoding": "deflate",
             "Content-Type": "application/json",
         }
-        data = _encode(body)
-        response = post(url, headers=headers, data=data)
+        response = post(url, cert=self._cert, data=data, headers=headers)
         response.raise_for_status()
 
 
@@ -94,6 +110,7 @@ class Config:
     base_path: str
     token: str
     verify_ssl: bool = True
+    certificate: Optional[Certificate] = None
 
 
 @dataclass
