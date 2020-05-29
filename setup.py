@@ -8,7 +8,7 @@ _classifiers = [
     "Programming Language :: Python :: 3.6",
 ]
 
-_install_requires = ["more-itertools", "python-dateutil", "requests"]
+_install_requires = ["dataclasses", "more-itertools", "python-dateutil", "requests"]
 
 with open("README.md") as file:
     _long_description = file.read()
@@ -23,7 +23,7 @@ setup(
     long_description=_long_description,
     long_description_content_type="text/markdown",
     name="elimity-insights-client",
-    python_requires=">=3.7",
+    python_requires=">=3.6,<3.7",
     py_modules=["elimity_insights_client"],
     url="https://github.com/elimity-com/insights-client-python",
     version="0.1.0",

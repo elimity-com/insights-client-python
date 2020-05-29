@@ -1,11 +1,11 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "4aa5bbbfb104ee46a3d93a99fc8bc886d83ea1c2e55c62761669e4cd3513c8b7"
+            "sha256": "a0b4550225bd5189d8afb6ccad81e2dda113014ceac5563cc45a52d05ab97f18"
         },
         "pipfile-spec": 6,
         "requires": {
-            "python_version": "3.7"
+            "python_version": "3.6"
         },
         "sources": [
             {
@@ -29,6 +29,13 @@
                 "sha256:fc323ffcaeaed0e0a02bf4d117757b98aed530d9ed4531e3e15460124c106691"
             ],
             "version": "==3.0.4"
+        },
+        "dataclasses": {
+            "hashes": [
+                "sha256:3459118f7ede7c8bea0fe795bff7c6c2ce287d01dd226202f7c9ebc0610a7836",
+                "sha256:494a6dcae3b8bcf80848eea2ef64c0cc5cd307ffc263e17cdf42f3e5420808e6"
+            ],
+            "version": "==0.7"
         },
         "elimity-insights-client": {
             "editable": true,
