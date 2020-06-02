@@ -15,7 +15,7 @@ from zlib import compressobj
 
 from dateutil.tz import tzlocal
 from dateutil.utils import default_tzinfo
-from more_itertools import ichunked
+from more_itertools import chunked
 from requests import post
 
 
@@ -235,7 +235,7 @@ def _encode(body: Any) -> Iterable[bytes]:
     encoded = map(str.encode, chunks)
     compressed = _compress(encoded)
     chained = chain.from_iterable(compressed)
-    buffered = ichunked(chained, DEFAULT_BUFFER_SIZE)
+    buffered = chunked(chained, DEFAULT_BUFFER_SIZE)
     return map(bytes, buffered)
 
 
