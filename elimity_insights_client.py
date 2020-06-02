@@ -79,8 +79,11 @@ class Client:
 
     def reload_domain_graph(self, graph: "DomainGraph") -> None:
         """Reload a domain graph."""
-        body = _encode_domain_graph(graph)
-        self._post(body, "domain-graph/reload")
+        self.reload_domain_graph_dump(graph.dump)
+
+    def reload_domain_graph_dump(self, dump: Iterable[bytes]) -> None:
+        """Reload a domain graph from a dump bytestream."""
+        self._post_dump(dump, "domain-graph/reload")
 
     @property
     def _cert(self) -> Optional[Tuple[str, str]]:
@@ -91,8 +94,12 @@ class Client:
             return certificate.certificate_path, certificate.private_key_path
 
     def _post(self, body: Any, path: str) -> None:
-        data = _encode(body)
+        dump = _dump(body)
+        self._post_dump(dump, path)
+
+    def _post_dump(self, dump: Iterable[bytes], path: str) -> None:
         url = f"{self._config.base_path}/{path}"
+        data = _make_data(dump)
         authorization = f"Bearer {self._config.token}"
         headers = {
             "Authorization": authorization,
@@ -143,6 +150,17 @@ class DomainGraph:
     entities: List["Entity"]
     relationships: List["Relationship"]
     timestamp: Optional[datetime] = None
+
+    @property
+    def dump(self) -> Iterable[bytes]:
+        """
+        Return a dump of the given domain graph as a bytestream.
+
+        This method can be used to reload the given domain graph multiple times
+        without encoding overhead.
+        """
+        body = _encode_domain_graph(self)
+        return _dump(body)
 
 
 @dataclass
@@ -222,21 +240,16 @@ Value = Union[
 ]
 
 
-def _compress(chunks: Iterable[bytes]) -> Iterable[bytes]:
-    compress = compressobj()
-    for chunk in chunks:
-        yield compress.compress(chunk)
-    yield compress.flush()
-
-
-def _encode(body: Any) -> Iterable[bytes]:
+def _dump(body: Any) -> Iterable[bytes]:
     encoder = JSONEncoder()
     chunks = encoder.iterencode(body)
-    encoded = map(str.encode, chunks)
-    compressed = _compress(encoded)
-    chained = chain.from_iterable(compressed)
-    buffered = chunked(chained, DEFAULT_BUFFER_SIZE)
-    return map(bytes, buffered)
+    compress = compressobj()
+
+    for chunk in chunks:
+        encoded = chunk.encode()
+        yield compress.compress(encoded)
+
+    yield compress.flush()
 
 
 def _encode_attribute_assignment(assignment: AttributeAssignment) -> Any:
@@ -386,3 +399,9 @@ def _encode_value(value: Value) -> Any:
     else:
         time_value = _encode_time(value.value)
         return {"type": "time", "value": time_value}
+
+
+def _make_data(dump: Iterable[bytes]) -> Iterable[bytes]:
+    chained = chain.from_iterable(dump)
+    buffered = chunked(chained, DEFAULT_BUFFER_SIZE)
+    return map(bytes, buffered)
