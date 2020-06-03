@@ -25,3 +25,9 @@ if __name__ == "__main__":
 ```sh
 $ pip install git+https://github.com/elimity-com/insights-client-python.git
 ```
+
+## Compatibility
+
+| Client version | Insights version |
+| -------------- | ---------------- |
+| 1              | ^2.7             |
