@@ -9,14 +9,14 @@ from datetime import datetime, date, time, timezone
 from enum import Enum, auto
 from io import DEFAULT_BUFFER_SIZE
 from itertools import chain
-from json import JSONEncoder
-from typing import List, Optional, Union, Any, Iterable, Tuple
+from typing import Optional, Union, Any, Iterable, Tuple
 from zlib import compressobj
 
 from dateutil.tz import tzlocal
 from dateutil.utils import default_tzinfo
 from more_itertools import chunked
 from requests import post
+from simplejson import JSONEncoder
 
 
 @dataclass
@@ -64,11 +64,10 @@ class Client:
         body = _encode_attribute_type(type_)
         self._post(body, "attributeTypes")
 
-    def create_connector_logs(self, logs: List["ConnectorLog"]) -> None:
+    def create_connector_logs(self, logs: Iterable["ConnectorLog"]) -> None:
         """Create connector logs."""
         body = map(_encode_connector_log, logs)
-        body_ = list(body)
-        self._post(body_, "connectorLogs")
+        self._post(body, "connectorLogs")
 
     def create_relationship_attribute_type(
         self, type_: "RelationshipAttributeType"
@@ -140,8 +139,8 @@ class DateValue:
 class DomainGraph:
     """Snapshot of a complete domain graph at a specific timestamp."""
 
-    entities: List["Entity"]
-    relationships: List["Relationship"]
+    entities: Iterable["Entity"]
+    relationships: Iterable["Relationship"]
     timestamp: Optional[datetime] = None
 
 
@@ -150,7 +149,7 @@ class Entity:
     """Entity of a specific type, including attribute assignments."""
 
     active: bool
-    attribute_assignments: List[AttributeAssignment]
+    attribute_assignments: Iterable[AttributeAssignment]
     id: str
     name: str
     type: str
@@ -174,7 +173,7 @@ class NumberValue:
 class Relationship:
     """Relationship between two entities, including attribute assignments."""
 
-    attribute_assignments: List[AttributeAssignment]
+    attribute_assignments: Iterable[AttributeAssignment]
     from_entity_id: str
     from_entity_type: str
     to_entity_id: str
@@ -230,7 +229,7 @@ def _compress(chunks: Iterable[bytes]) -> Iterable[bytes]:
 
 
 def _encode(body: Any) -> Iterable[bytes]:
-    encoder = JSONEncoder()
+    encoder = JSONEncoder(iterable_as_array=True)
     chunks = encoder.iterencode(body)
     encoded = map(str.encode, chunks)
     compressed = _compress(encoded)
@@ -283,10 +282,8 @@ def _encode_datetime(datetime_: datetime) -> Any:
 
 def _encode_domain_graph(graph: DomainGraph) -> Any:
     entities = map(_encode_entity, graph.entities)
-    entities_ = list(entities)
     relationships = map(_encode_relationship, graph.relationships)
-    relationships_ = list(relationships)
-    obj = {"entities": entities_, "relationships": relationships_}
+    obj = {"entities": entities, "relationships": relationships}
     if graph.timestamp is None:
         return obj
     else:
@@ -296,10 +293,9 @@ def _encode_domain_graph(graph: DomainGraph) -> Any:
 
 def _encode_entity(entity: Entity) -> Any:
     assignments = map(_encode_attribute_assignment, entity.attribute_assignments)
-    assignments_ = list(assignments)
     return {
         "active": entity.active,
-        "attributeAssignments": assignments_,
+        "attributeAssignments": assignments,
         "id": entity.id,
         "name": entity.name,
         "type": entity.type,
@@ -319,9 +315,8 @@ def _encode_level(level: Level) -> Any:
 
 def _encode_relationship(relationship: Relationship) -> Any:
     assignments = map(_encode_attribute_assignment, relationship.attribute_assignments)
-    assignments_ = list(assignments)
     return {
-        "attributeAssignments": assignments_,
+        "attributeAssignments": assignments,
         "fromId": relationship.from_entity_id,
         "toId": relationship.to_entity_id,
         "fromType": relationship.from_entity_type,
