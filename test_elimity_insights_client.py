@@ -54,8 +54,9 @@ class TestClient(TestCase):
                 timestamp=datetime(2020, 10, 31, 23, 55, tzinfo=timezone.utc),
             ),
         ]
+        logs_iter = iter(logs)
         with _create_client(_CreateConnectorLogsHandler) as client:
-            client.create_connector_logs(logs)
+            client.create_connector_logs(logs_iter)
 
     def test_create_relationship_attribute_type(self) -> None:
         type_ = RelationshipAttributeType(
