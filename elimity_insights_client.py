@@ -81,24 +81,20 @@ class Client:
         body = _encode_domain_graph(graph)
         self._post(body, "domain-graph/reload")
 
-    @property
-    def _cert(self) -> Optional[Tuple[str, str]]:
-        certificate = self._config.certificate
-        if certificate is None:
-            return None
-        else:
-            return certificate.certificate_path, certificate.private_key_path
-
     def _post(self, body: Any, path: str) -> None:
         data = _encode(body)
-        url = f"{self._config.base_path}/{path}"
-        authorization = f"Bearer {self._config.token}"
+        config = self._config
+        url = f"{config.base_path}/{path}"
+        cert = _cert(config.certificate)
+        authorization = f"Bearer {config.token}"
         headers = {
             "Authorization": authorization,
             "Content-Encoding": "deflate",
             "Content-Type": "application/json",
         }
-        response = post(url, cert=self._cert, data=data, headers=headers)
+        response = post(
+            url, cert=cert, data=data, headers=headers, verify=config.verify_ssl
+        )
         response.raise_for_status()
 
 
@@ -219,6 +215,13 @@ class Type(Enum):
 Value = Union[
     BooleanValue, DateValue, DateTimeValue, NumberValue, StringValue, TimeValue
 ]
+
+
+def _cert(certificate: Certificate) -> Optional[Tuple[str, str]]:
+    if certificate is None:
+        return None
+    else:
+        return certificate.certificate_path, certificate.private_key_path
 
 
 def _compress(chunks: Iterable[bytes]) -> Iterable[bytes]:
