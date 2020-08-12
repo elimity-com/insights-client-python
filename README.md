@@ -5,7 +5,7 @@ Insights server.
 
 ## Usage
 
-```python
+```python3
 from datetime import datetime
 
 from elimity_insights_client import Client, Config, ConnectorLog, Level
@@ -30,4 +30,5 @@ $ pip install git+https://github.com/elimity-com/insights-client-python.git
 
 | Client version | Insights version |
 | -------------- | ---------------- |
-| 1              | ^2.8             |
+| 1              | 2.8 - 2.10       |
+| 2              | ^2.11            |

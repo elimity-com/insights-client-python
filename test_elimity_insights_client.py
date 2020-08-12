@@ -15,9 +15,6 @@ from httpchunked import decode
 from elimity_insights_client import (
     Client,
     Config,
-    AttributeType,
-    Type,
-    RelationshipAttributeType,
     Relationship,
     Entity,
     DomainGraph,
@@ -34,13 +31,6 @@ from elimity_insights_client import (
 
 
 class TestClient(TestCase):
-    def test_create_attribute_type(self) -> None:
-        type_ = AttributeType(
-            description="foo", entity_type="bar", name="baz", type=Type.BOOLEAN
-        )
-        with _create_client(_CreateAttributeTypeHandler) as client:
-            client.create_attribute_type(type_)
-
     def test_create_connector_logs(self) -> None:
         logs = [
             ConnectorLog(
@@ -57,17 +47,6 @@ class TestClient(TestCase):
         logs_iter = iter(logs)
         with _create_client(_CreateConnectorLogsHandler) as client:
             client.create_connector_logs(logs_iter)
-
-    def test_create_relationship_attribute_type(self) -> None:
-        type_ = RelationshipAttributeType(
-            description="foo",
-            from_entity_type="bar",
-            name="baz",
-            to_entity_type="asd",
-            type=Type.DATE_TIME,
-        )
-        with _create_client(_CreateRelationshipAttributeTypeHandler) as client:
-            client.create_relationship_attribute_type(type_)
 
     def test_encode_datetime(self) -> None:
         # use pre-epoch local timestamp to trigger https://bugs.python.org/issue36759
@@ -164,37 +143,11 @@ def _decode(chunked: BinaryIO) -> Any:
     return loads(serialized)
 
 
-class _CreateAttributeTypeHandler(BaseHTTPRequestHandler):
-    protocol_version = "HTTP/1.1"
-
-    def do_POST(self) -> None:
-        if self.path != "/attributeTypes":
-            self.send_error(HTTPStatus.NOT_FOUND)
-            return
-
-        expected = {
-            "category": "bar",
-            "description": "foo",
-            "name": "baz",
-            "type": "boolean",
-        }
-        actual = _decode(self.rfile)
-        if expected != actual:
-            self.send_error(HTTPStatus.BAD_REQUEST)
-            return
-
-        self.send_response(HTTPStatus.NO_CONTENT)
-        self.end_headers()
-
-    def log_message(self, format, *args):
-        pass
-
-
 class _CreateConnectorLogsHandler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
 
     def do_POST(self) -> None:
-        if self.path != "/connectorLogs":
+        if self.path != "/custom-connector-logs":
             self.send_error(HTTPStatus.NOT_FOUND)
             return
 
@@ -222,33 +175,6 @@ class _CreateConnectorLogsHandler(BaseHTTPRequestHandler):
         pass
 
 
-class _CreateRelationshipAttributeTypeHandler(BaseHTTPRequestHandler):
-    protocol_version = "HTTP/1.1"
-
-    def do_POST(self) -> None:
-        if self.path != "/relationshipAttributeTypes":
-            self.send_error(HTTPStatus.NOT_FOUND)
-            return
-
-        expected = {
-            "childType": "asd",
-            "description": "foo",
-            "name": "baz",
-            "parentType": "bar",
-            "type": "dateTime",
-        }
-        actual = _decode(self.rfile)
-        if expected != actual:
-            self.send_error(HTTPStatus.BAD_REQUEST)
-            return
-
-        self.send_response(HTTPStatus.NO_CONTENT)
-        self.end_headers()
-
-    def log_message(self, format, *args) -> None:
-        pass
-
-
 class _EncodeDatetimeHandler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
 
@@ -267,7 +193,7 @@ class _ReloadDomainGraphHandler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
 
     def do_POST(self) -> None:
-        if self.path != "/domain-graph/reload":
+        if self.path != "/custom-connector-domain-graphs":
             self.send_error(HTTPStatus.NOT_FOUND)
             return
 
