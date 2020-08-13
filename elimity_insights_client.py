@@ -28,16 +28,6 @@ class AttributeAssignment:
 
 
 @dataclass
-class AttributeType:
-    """Attribute type for an entity type."""
-
-    description: str
-    entity_type: str
-    name: str
-    type: "Type"
-
-
-@dataclass
 class BooleanValue:
     """Value to assign for a boolean attribute type."""
 
@@ -59,27 +49,15 @@ class Client:
         """Return a new client with the given configuration."""
         self._config = config
 
-    def create_attribute_type(self, type_: AttributeType) -> None:
-        """Create a new attribute type."""
-        body = _encode_attribute_type(type_)
-        self._post(body, "attributeTypes")
-
     def create_connector_logs(self, logs: Iterable["ConnectorLog"]) -> None:
         """Create connector logs."""
         body = map(_encode_connector_log, logs)
-        self._post(body, "connectorLogs")
-
-    def create_relationship_attribute_type(
-        self, type_: "RelationshipAttributeType"
-    ) -> None:
-        """Create a new relationship attribute type."""
-        body = _encode_relationship_attribute_type(type_)
-        self._post(body, "relationshipAttributeTypes")
+        self._post(body, "custom-connector-logs")
 
     def reload_domain_graph(self, graph: "DomainGraph") -> None:
         """Reload a domain graph."""
         body = _encode_domain_graph(graph)
-        self._post(body, "domain-graph/reload")
+        self._post(body, "custom-connector-domain-graphs")
 
     def _post(self, body: Any, path: str) -> None:
         data = _encode(body)
@@ -177,17 +155,6 @@ class Relationship:
 
 
 @dataclass
-class RelationshipAttributeType:
-    """Attribute type for relationships between entities of specific types."""
-
-    description: str
-    from_entity_type: str
-    name: str
-    to_entity_type: str
-    type: "Type"
-
-
-@dataclass
 class StringValue:
     """Value to assign for a string attribute type."""
 
@@ -199,17 +166,6 @@ class TimeValue:
     """Value to assign for a time attribute type."""
 
     value: time
-
-
-class Type(Enum):
-    """Type of an attribute type, determining valid assignment values."""
-
-    BOOLEAN = auto()
-    DATE = auto()
-    DATE_TIME = auto()
-    NUMBER = auto()
-    STRING = auto()
-    TIME = auto()
 
 
 Value = Union[
@@ -246,16 +202,6 @@ def _encode_attribute_assignment(assignment: AttributeAssignment) -> Any:
     return {
         "attributeTypeName": assignment.attribute_type_name,
         "value": value,
-    }
-
-
-def _encode_attribute_type(type_: AttributeType) -> Any:
-    type__ = _encode_type(type_.type)
-    return {
-        "category": type_.entity_type,
-        "description": type_.description,
-        "name": type_.name,
-        "type": type__,
     }
 
 
@@ -327,38 +273,12 @@ def _encode_relationship(relationship: Relationship) -> Any:
     }
 
 
-def _encode_relationship_attribute_type(type_: RelationshipAttributeType) -> Any:
-    type__ = _encode_type(type_.type)
-    return {
-        "childType": type_.to_entity_type,
-        "description": type_.description,
-        "name": type_.name,
-        "parentType": type_.from_entity_type,
-        "type": type__,
-    }
-
-
 def _encode_time(time_: time) -> Any:
     datetime_ = datetime(
         2000, 1, 1, time_.hour, time_.minute, time_.second, tzinfo=time_.tzinfo,
     )
     datetime__ = datetime_.astimezone(timezone.utc)
     return f"{datetime__:%H:%M:%S}Z"
-
-
-def _encode_type(type_: Type) -> Any:
-    if type_ == Type.BOOLEAN:
-        return "boolean"
-    elif type_ == Type.DATE:
-        return "date"
-    elif type_ == Type.DATE_TIME:
-        return "dateTime"
-    elif type_ == Type.NUMBER:
-        return "number"
-    elif type_ == Type.STRING:
-        return "string"
-    else:
-        return "time"
 
 
 def _encode_value(value: Value) -> Any:
