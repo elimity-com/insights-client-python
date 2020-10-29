@@ -9,13 +9,13 @@ from datetime import datetime, date, time, timezone
 from enum import Enum, auto
 from io import DEFAULT_BUFFER_SIZE
 from itertools import chain
-from typing import Optional, Union, Any, Iterable, Tuple
+from typing import Optional, Union, Any, Iterable, Tuple, Dict, TypeVar, Callable, List
 from zlib import compressobj
 
 from dateutil.tz import tzlocal
 from dateutil.utils import default_tzinfo
 from more_itertools import chunked
-from requests import post
+from requests import request, Response
 from simplejson import JSONEncoder
 
 
@@ -25,6 +25,17 @@ class AttributeAssignment:
 
     attribute_type_name: str
     value: "Value"
+
+
+@dataclass
+class AttributeType:
+    """Attribute type for an entity type."""
+
+    archived: bool
+    description: str
+    entity_type: str
+    name: str
+    type: "Type"
 
 
 @dataclass
@@ -54,26 +65,43 @@ class Client:
         body = map(_encode_connector_log, logs)
         self._post(body, "custom-connector-logs")
 
+    def get_domain_graph_schema(self) -> "DomainGraphSchema":
+        """Retrieve the domain graph schema."""
+        additional_headers = {}
+        response = self._request(additional_headers, None, "GET", "domain-graph-schema")
+        json = response.json()
+        return _decode_domain_graph_schema(json)
+
     def reload_domain_graph(self, graph: "DomainGraph") -> None:
         """Reload a domain graph."""
         body = _encode_domain_graph(graph)
         self._post(body, "custom-connector-domain-graphs")
 
     def _post(self, body: Any, path: str) -> None:
+        additional_headers = {
+            "Content-Encoding": "deflate",
+            "Content-Type": "application/json",
+        }
         data = _encode(body)
+        self._request(additional_headers, data, "POST", path)
+
+    def _request(
+        self,
+        additional_headers: Dict[str, str],
+        data: Optional[Iterable[bytes]],
+        method: str,
+        path: str,
+    ) -> Response:
         config = self._config
         url = f"{config.base_path}/{path}"
         cert = _cert(config.certificate)
         authorization = f"Bearer {config.token}"
-        headers = {
-            "Authorization": authorization,
-            "Content-Encoding": "deflate",
-            "Content-Type": "application/json",
-        }
-        response = post(
-            url, cert=cert, data=data, headers=headers, verify=config.verify_ssl
+        headers = {"Authorization": authorization, **additional_headers}
+        response = request(
+            method, url, cert=cert, data=data, headers=headers, verify=config.verify_ssl
         )
         response.raise_for_status()
+        return response
 
 
 @dataclass
@@ -119,6 +147,15 @@ class DomainGraph:
 
 
 @dataclass
+class DomainGraphSchema:
+    """Schema determining valid domain graphs."""
+
+    attribute_types: List[AttributeType]
+    entity_types: List["EntityType"]
+    relationship_attribute_types: List["RelationshipAttributeType"]
+
+
+@dataclass
 class Entity:
     """Entity of a specific type, including attribute assignments."""
 
@@ -127,6 +164,16 @@ class Entity:
     id: str
     name: str
     type: str
+
+
+@dataclass
+class EntityType:
+    """Type of an entity."""
+
+    icon: str
+    key: str
+    plural: str
+    singular: str
 
 
 class Level(Enum):
@@ -155,6 +202,18 @@ class Relationship:
 
 
 @dataclass
+class RelationshipAttributeType:
+    """Attribute type for relationships between entities of specific types."""
+
+    archived: bool
+    description: str
+    from_entity_type: str
+    name: str
+    to_entity_type: str
+    type: "Type"
+
+
+@dataclass
 class StringValue:
     """Value to assign for a string attribute type."""
 
@@ -173,6 +232,17 @@ Value = Union[
 ]
 
 
+class Type(Enum):
+    """Type of an attribute type, determining valid assignment values."""
+
+    BOOLEAN = auto()
+    DATE = auto()
+    DATE_TIME = auto()
+    NUMBER = auto()
+    STRING = auto()
+    TIME = auto()
+
+
 def _cert(certificate: Certificate) -> Optional[Tuple[str, str]]:
     if certificate is None:
         return None
@@ -185,6 +255,66 @@ def _compress(chunks: Iterable[bytes]) -> Iterable[bytes]:
     for chunk in chunks:
         yield compress.compress(chunk)
     yield compress.flush()
+
+
+def _decode_attribute_type(json: Any) -> AttributeType:
+    archived = json["archived"]
+    description = json["description"]
+    entity_type = json["category"]
+    name = json["name"]
+    type_ = json["type"]
+    type__ = _decode_type(type_)
+    return AttributeType(archived, description, entity_type, name, type__)
+
+
+def _decode_domain_graph_schema(json: Any) -> DomainGraphSchema:
+    attribute_types = json["entityAttributeTypes"]
+    attribute_types_ = _map(_decode_attribute_type, attribute_types)
+    entity_types = json["entityTypes"]
+    entity_types_ = _map(_decode_entity_type, entity_types)
+    relationship_attribute_types = json["relationshipAttributeTypes"]
+    relationship_attribute_types_ = _map(
+        _decode_relationship_attribute_types, relationship_attribute_types
+    )
+    return DomainGraphSchema(
+        attribute_types_, entity_types_, relationship_attribute_types_
+    )
+
+
+def _decode_relationship_attribute_types(json: Any) -> RelationshipAttributeType:
+    archived = json["archived"]
+    description = json.get("description", "")
+    from_entity_type = json["parentType"]
+    name = json["name"]
+    to_entity_type = json["childType"]
+    type_ = json["type"]
+    type__ = _decode_type(type_)
+    return RelationshipAttributeType(
+        archived, description, from_entity_type, name, to_entity_type, type__
+    )
+
+
+def _decode_entity_type(json: Any) -> EntityType:
+    icon = json["icon"]
+    key = json["key"]
+    plural = json["plural"]
+    singular = json["singular"]
+    return EntityType(icon, key, plural, singular)
+
+
+def _decode_type(json: Any) -> Type:
+    if json == "boolean":
+        return Type.BOOLEAN
+    elif json == "date":
+        return Type.DATE
+    elif json == "dateTime":
+        return Type.DATE_TIME
+    elif json == "number":
+        return Type.NUMBER
+    elif json == "string":
+        return Type.STRING
+    else:
+        return Type.TIME
 
 
 def _encode(body: Any) -> Iterable[bytes]:
@@ -304,3 +434,13 @@ def _encode_value(value: Value) -> Any:
     else:
         time_value = _encode_time(value.value)
         return {"type": "time", "value": time_value}
+
+
+def _map(callable_: Callable[["_T"], "_U"], iterable: Any) -> List["_U"]:
+    iterator = map(callable_, iterable)
+    return list(iterator)
+
+
+_T = TypeVar("_T")
+
+_U = TypeVar("_U")

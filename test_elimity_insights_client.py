@@ -27,6 +27,11 @@ from elimity_insights_client import (
     TimeValue,
     ConnectorLog,
     Level,
+    DomainGraphSchema,
+    AttributeType,
+    Type,
+    EntityType,
+    RelationshipAttributeType,
 )
 
 
@@ -55,6 +60,22 @@ class TestClient(TestCase):
         logs = [log]
         with _create_client(_EncodeDatetimeHandler) as client:
             client.create_connector_logs(logs)
+
+    def test_get_domain_graph_schema(self) -> None:
+        attribute_type = AttributeType(False, "foo", "bar", "baz", Type.STRING)
+        attribute_types = [attribute_type]
+        entity_type = EntityType("foo", "bar", "baz", "bax")
+        entity_types = [entity_type]
+        relationship_attribute_type = RelationshipAttributeType(
+            True, "bar", "bax", "baz", "foo", Type.DATE_TIME
+        )
+        relationship_attribute_types = [relationship_attribute_type]
+        expected = DomainGraphSchema(
+            attribute_types, entity_types, relationship_attribute_types
+        )
+        with _create_client(_GetDomainGraphSchemaHandler) as client:
+            actual = client.get_domain_graph_schema()
+        self.assertEqual(expected, actual)
 
     def test_reload_domain_graph(self) -> None:
         graph = DomainGraph(
@@ -184,6 +205,56 @@ class _EncodeDatetimeHandler(BaseHTTPRequestHandler):
 
         self.send_response(HTTPStatus.NO_CONTENT)
         self.end_headers()
+
+    def log_message(self, format, *args) -> None:
+        pass
+
+
+class _GetDomainGraphSchemaHandler(BaseHTTPRequestHandler):
+    protocol_version = "HTTP/1.1"
+
+    def do_GET(self) -> None:
+        if self.path != "/domain-graph-schema":
+            self.send_error(HTTPStatus.NOT_FOUND)
+            return
+
+        self.send_response(HTTPStatus.OK)
+        schema = b"""{
+    "entityAttributeTypes": [
+        {
+            "archived": false,
+            "description": "foo",
+            "category": "bar",
+            "name": "baz",
+            "type": "string"
+        }
+    ],
+    "entityTypes": [
+        {
+            "icon": "foo",
+            "key": "bar",
+            "plural": "baz",
+            "singular": "bax"
+        }
+    ],
+    "relationshipAttributeTypes": [
+        {
+            "archived": true,
+            "childType": "foo",
+            "description": "bar",
+            "name": "baz",
+            "parentType": "bax",
+            "type": "dateTime"
+        }
+    ]
+}
+"""
+        nb_bytes = len(schema)
+        content_length = str(nb_bytes)
+        self.send_header("Content-Length", content_length)
+        self.send_header("Content-Type", "application/json")
+        self.end_headers()
+        self.wfile.write(schema)
 
     def log_message(self, format, *args) -> None:
         pass
