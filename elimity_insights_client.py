@@ -405,7 +405,13 @@ def _encode_relationship(relationship: Relationship) -> Any:
 
 def _encode_time(time_: time) -> Any:
     datetime_ = datetime(
-        2000, 1, 1, time_.hour, time_.minute, time_.second, tzinfo=time_.tzinfo,
+        2000,
+        1,
+        1,
+        time_.hour,
+        time_.minute,
+        time_.second,
+        tzinfo=time_.tzinfo,
     )
     datetime__ = datetime_.astimezone(timezone.utc)
     return f"{datetime__:%H:%M:%S}Z"
