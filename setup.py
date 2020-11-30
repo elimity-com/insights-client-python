@@ -8,7 +8,7 @@ _classifiers = [
     "Programming Language :: Python :: 3.6",
 ]
 
-_install_requires = ["more-itertools", "python-dateutil", "requests", "simplejson"]
+_install_requires = ["python-dateutil", "requests", "simplejson"]
 
 with open("README.md") as file:
     _long_description = file.read()

@@ -2,15 +2,11 @@ from contextlib import contextmanager
 from datetime import datetime, timezone, time
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from io import BytesIO
 from json import loads
-from os import devnull
 from threading import Thread
-from typing import BinaryIO, Any, Iterable
+from typing import Any, Iterable
 from unittest import TestCase
 from zlib import decompress
-
-from httpchunked import decode
 
 from elimity_insights_client import (
     Client,
@@ -156,10 +152,10 @@ def _create_client(handler_class) -> Iterable[Client]:
         thread.join()
 
 
-def _decode(chunked: BinaryIO) -> Any:
-    buffer = BytesIO()
-    decode(buffer, chunked)
-    compressed = buffer.getvalue()
+def _decode(handler: BaseHTTPRequestHandler) -> Any:
+    content_length_str = handler.headers["Content-Length"]
+    content_length = int(content_length_str)
+    compressed = handler.rfile.read(content_length)
     serialized = decompress(compressed)
     return loads(serialized)
 
@@ -184,7 +180,7 @@ class _CreateConnectorLogsHandler(BaseHTTPRequestHandler):
                 "timestamp": "2020-10-31T23:55:00+00:00",
             },
         ]
-        actual = _decode(self.rfile)
+        actual = _decode(self)
         if expected != actual:
             self.send_error(HTTPStatus.BAD_REQUEST)
             return
@@ -200,8 +196,9 @@ class _EncodeDatetimeHandler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
 
     def do_POST(self) -> None:
-        with open(devnull, "bw") as file:
-            decode(file, self.rfile)
+        content_length_str = self.headers["Content-Length"]
+        content_length = int(content_length_str)
+        self.rfile.read(content_length)
 
         self.send_response(HTTPStatus.NO_CONTENT)
         self.end_headers()
@@ -330,7 +327,7 @@ class _ReloadDomainGraphHandler(BaseHTTPRequestHandler):
             ],
             "historyTimestamp": "2001-02-03T04:05:06+00:00",
         }
-        actual = _decode(self.rfile)
+        actual = _decode(self)
         if expected != actual:
             self.send_error(HTTPStatus.BAD_REQUEST)
             return

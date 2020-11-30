@@ -7,14 +7,11 @@ being defined in the local system timezone.
 from dataclasses import dataclass
 from datetime import datetime, date, time, timezone
 from enum import Enum, auto
-from io import DEFAULT_BUFFER_SIZE
-from itertools import chain
 from typing import Optional, Union, Any, Iterable, Tuple, Dict, TypeVar, Callable, List
 from zlib import compressobj
 
 from dateutil.tz import tzlocal
 from dateutil.utils import default_tzinfo
-from more_itertools import chunked
 from requests import request, Response
 from simplejson import JSONEncoder
 
@@ -85,7 +82,7 @@ class Client:
     def _request(
         self,
         additional_headers: Dict[str, str],
-        data: Optional[Iterable[bytes]],
+        data: Optional[bytes],
         method: str,
         path: str,
     ) -> Response:
@@ -314,14 +311,12 @@ def _decode_type(json: Any) -> Type:
         return Type.TIME
 
 
-def _encode(body: Any) -> Iterable[bytes]:
+def _encode(body: Any) -> bytes:
     encoder = JSONEncoder(iterable_as_array=True)
     chunks = encoder.iterencode(body)
     encoded = map(str.encode, chunks)
     compressed = _compress(encoded)
-    chained = chain.from_iterable(compressed)
-    buffered = chunked(chained, DEFAULT_BUFFER_SIZE)
-    return map(bytes, buffered)
+    return b"".join(compressed)
 
 
 def _encode_attribute_assignment(assignment: AttributeAssignment) -> Any:
