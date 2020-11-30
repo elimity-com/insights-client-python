@@ -78,7 +78,7 @@ class Client:
         self._post(body, "custom-connector-domain-graphs")
 
     def _post(self, body: Any, path: str) -> None:
-        additional_headers = {"Content-Type": "application/prs.deflate-json"}
+        additional_headers = {"Content-Type": "application/x.deflate-json"}
         data = _encode(body)
         self._request(additional_headers, data, "POST", path)
 
