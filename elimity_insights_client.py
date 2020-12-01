@@ -7,6 +7,7 @@ being defined in the local system timezone.
 from dataclasses import dataclass
 from datetime import datetime, date, time, timezone
 from enum import Enum, auto
+from logging import info
 from typing import Optional, Union, Any, Iterable, Tuple, Dict, TypeVar, Callable, List
 from zlib import compressobj
 
@@ -76,7 +77,11 @@ class Client:
 
     def _post(self, body: Any, path: str) -> None:
         additional_headers = {"Content-Type": "application/x.deflate-json"}
+        info("encoding request body")
         data = _encode(body)
+        nb_bytes = len(data)
+        message = f"sending request body of {nb_bytes} bytes"
+        info(message)
         self._request(additional_headers, data, "POST", path)
 
     def _request(
