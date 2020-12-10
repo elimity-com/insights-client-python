@@ -11,7 +11,7 @@ from datetime import datetime
 from elimity_insights_client import Client, Config, ConnectorLog, Level
 
 if __name__ == "__main__":
-    config = Config(base_path="https://local.elimity.com:8081/api", token="token")
+    config = Config(url="https://local.elimity.com:8081", token="token")
     client = Client(config)
 
     timestamp = datetime.now()
@@ -31,4 +31,4 @@ $ pip install git+https://github.com/elimity-com/insights-client-python.git
 | Client version | Insights version |
 | -------------- | ---------------- |
 | 1              | 2.8 - 2.10       |
-| 2              | ^2.11            |
+| 2 - 3          | ^2.11            |
