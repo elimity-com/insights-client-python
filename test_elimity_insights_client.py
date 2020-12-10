@@ -146,8 +146,8 @@ def _create_client(handler_class) -> Iterable[Client]:
     thread = Thread(target=server.serve_forever)
     thread.start()
 
-    base_path = f"http://localhost:{server.server_port}"
-    config = Config(base_path=base_path, token="foo")
+    url = f"http://localhost:{server.server_port}"
+    config = Config(url=url, token="foo")
     try:
         yield Client(config)
     finally:
@@ -168,7 +168,7 @@ class _CreateConnectorLogsHandler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
 
     def do_POST(self) -> None:
-        if self.path != "/custom-connector-logs":
+        if self.path != "/api/custom-connector-logs":
             self.send_error(HTTPStatus.NOT_FOUND)
             return
 
@@ -214,7 +214,7 @@ class _GetDomainGraphSchemaHandler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
 
     def do_GET(self) -> None:
-        if self.path != "/domain-graph-schema":
+        if self.path != "/api/domain-graph-schema":
             self.send_error(HTTPStatus.NOT_FOUND)
             return
 
@@ -264,7 +264,7 @@ class _ReloadDomainGraphHandler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
 
     def do_POST(self) -> None:
-        if self.path != "/custom-connector-domain-graphs":
+        if self.path != "/api/custom-connector-domain-graphs":
             self.send_error(HTTPStatus.NOT_FOUND)
             return
 

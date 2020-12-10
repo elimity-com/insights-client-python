@@ -93,7 +93,7 @@ class Client:
         path: str,
     ) -> Response:
         config = self._config
-        url = f"{config.base_path}/{path}"
+        url = f"{config.url}/api/{path}"
         cert = _cert(config.certificate)
         authorization = f"Bearer {config.token}"
         headers = {"Authorization": authorization, **additional_headers}
@@ -108,7 +108,7 @@ class Client:
 class Config:
     """Configuration for an Elimity Insights client."""
 
-    base_path: str
+    url: str
     token: str
     verify_ssl: bool = True
     certificate: Optional[Certificate] = None
