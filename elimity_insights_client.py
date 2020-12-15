@@ -8,7 +8,19 @@ from dataclasses import dataclass
 from datetime import datetime, date, time, timezone
 from enum import Enum, auto
 from logging import info
-from typing import Optional, Union, Any, Iterable, Tuple, Dict, TypeVar, Callable, List
+from tempfile import TemporaryFile
+from typing import (
+    Optional,
+    Union,
+    Any,
+    Iterable,
+    Tuple,
+    Dict,
+    TypeVar,
+    Callable,
+    List,
+    IO,
+)
 from zlib import compressobj
 
 from dateutil.tz import tzlocal
@@ -78,16 +90,17 @@ class Client:
     def _post(self, body: Any, path: str) -> None:
         additional_headers = {"Content-Type": "application/x.deflate-json"}
         info("encoding request body")
-        data = _encode(body)
-        nb_bytes = len(data)
-        message = f"sending request body of {nb_bytes} bytes"
-        info(message)
-        self._request(additional_headers, data, "POST", path)
+        with TemporaryFile() as file:
+            nb_bytes = _encode(body, file)
+            file.seek(0)
+            message = f"sending request body of {nb_bytes} bytes"
+            info(message)
+            self._request(additional_headers, file, "POST", path)
 
     def _request(
         self,
         additional_headers: Dict[str, str],
-        data: Optional[bytes],
+        data: Optional[IO[bytes]],
         method: str,
         path: str,
     ) -> Response:
@@ -316,12 +329,15 @@ def _decode_type(json: Any) -> Type:
         return Type.TIME
 
 
-def _encode(body: Any) -> bytes:
+def _encode(body: Any, file: IO[bytes]) -> int:
     encoder = JSONEncoder(iterable_as_array=True)
     chunks = encoder.iterencode(body)
     encoded = map(str.encode, chunks)
-    compressed = _compress(encoded)
-    return b"".join(compressed)
+    nb_bytes = 0
+    for chunk in _compress(encoded):
+        nb_bytes += len(chunk)
+        file.write(chunk)
+    return nb_bytes
 
 
 def _encode_attribute_assignment(assignment: AttributeAssignment) -> Any:
