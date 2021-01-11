@@ -5,16 +5,13 @@ Note that this module interprets timestamps without timezone information as
 being defined in the local system timezone.
 """
 from dataclasses import dataclass
-from datetime import datetime, date, time, timezone
+from datetime import datetime
 from enum import Enum, auto
-from io import DEFAULT_BUFFER_SIZE
-from itertools import chain
 from typing import Optional, Union, Any, Iterable, Tuple, Dict, TypeVar, Callable, List
 from zlib import compressobj
 
 from dateutil.tz import tzlocal
 from dateutil.utils import default_tzinfo
-from more_itertools import chunked
 from requests import request, Response
 from simplejson import JSONEncoder
 
@@ -62,8 +59,10 @@ class Client:
 
     def create_connector_logs(self, logs: Iterable["ConnectorLog"]) -> None:
         """Create connector logs."""
-        body = map(_encode_connector_log, logs)
-        self._post(body, "custom-connector-logs")
+        json = map(_encode_connector_log, logs)
+        json_string = _encoder.encode(json)
+        json_bytes = json_string.encode()
+        self._post("application/json", json_bytes, "custom-connector-logs")
 
     def get_domain_graph_schema(self) -> "DomainGraphSchema":
         """Retrieve the domain graph schema."""
@@ -74,21 +73,21 @@ class Client:
 
     def reload_domain_graph(self, graph: "DomainGraph") -> None:
         """Reload a domain graph."""
-        body = _encode_domain_graph(graph)
-        self._post(body, "custom-connector-domain-graphs")
+        json = _encode_domain_graph(graph)
+        json_bytes_chunks = _compress_domain_graph(json)
+        json_bytes = b"".join(json_bytes_chunks)
+        self._post(
+            "application/octet-stream", json_bytes, "custom-connector-domain-graphs"
+        )
 
-    def _post(self, body: Any, path: str) -> None:
-        additional_headers = {
-            "Content-Encoding": "deflate",
-            "Content-Type": "application/json",
-        }
-        data = _encode(body)
+    def _post(self, content_type: str, data: bytes, path: str) -> None:
+        additional_headers = {"Content-Type": content_type}
         self._request(additional_headers, data, "POST", path)
 
     def _request(
         self,
         additional_headers: Dict[str, str],
-        data: Optional[Iterable[bytes]],
+        data: Optional[bytes],
         method: str,
         path: str,
     ) -> Response:
@@ -124,17 +123,31 @@ class ConnectorLog:
 
 
 @dataclass
-class DateTimeValue:
-    """Value to assign for a date-time attribute type."""
+class DateTime:
+    """Date-time in UTC."""
 
-    value: datetime
+    year: int
+    month: int
+    day: int
+    hour: int
+    minute: int
+    second: int
+
+
+@dataclass
+class DateTimeValue:
+    """Value to assign for a date-time attribute type, in UTC."""
+
+    value: DateTime
 
 
 @dataclass
 class DateValue:
     """Value to assign for a date attribute type."""
 
-    value: date
+    year: int
+    month: int
+    day: int
 
 
 @dataclass
@@ -143,7 +156,7 @@ class DomainGraph:
 
     entities: Iterable["Entity"]
     relationships: Iterable["Relationship"]
-    timestamp: Optional[datetime] = None
+    timestamp: Optional[DateTime] = None
 
 
 @dataclass
@@ -159,7 +172,6 @@ class DomainGraphSchema:
 class Entity:
     """Entity of a specific type, including attribute assignments."""
 
-    active: bool
     attribute_assignments: Iterable[AttributeAssignment]
     id: str
     name: str
@@ -222,9 +234,11 @@ class StringValue:
 
 @dataclass
 class TimeValue:
-    """Value to assign for a time attribute type."""
+    """Value to assign for a time attribute type, in UTC."""
 
-    value: time
+    hour: int
+    minute: int
+    second: int
 
 
 Value = Union[
@@ -250,10 +264,11 @@ def _cert(certificate: Certificate) -> Optional[Tuple[str, str]]:
         return certificate.certificate_path, certificate.private_key_path
 
 
-def _compress(chunks: Iterable[bytes]) -> Iterable[bytes]:
+def _compress_domain_graph(json: Any) -> Iterable[bytes]:
     compress = compressobj()
-    for chunk in chunks:
-        yield compress.compress(chunk)
+    for json_string_chunk in _encoder.iterencode(json):
+        json_bytes_chunk = json_string_chunk.encode()
+        yield compress.compress(json_bytes_chunk)
     yield compress.flush()
 
 
@@ -317,26 +332,12 @@ def _decode_type(json: Any) -> Type:
         return Type.TIME
 
 
-def _encode(body: Any) -> Iterable[bytes]:
-    encoder = JSONEncoder(iterable_as_array=True)
-    chunks = encoder.iterencode(body)
-    encoded = map(str.encode, chunks)
-    compressed = _compress(encoded)
-    chained = chain.from_iterable(compressed)
-    buffered = chunked(chained, DEFAULT_BUFFER_SIZE)
-    return map(bytes, buffered)
-
-
 def _encode_attribute_assignment(assignment: AttributeAssignment) -> Any:
     value = _encode_value(assignment.value)
     return {
         "attributeTypeName": assignment.attribute_type_name,
         "value": value,
     }
-
-
-def _encode_bool(bool_: bool) -> Any:
-    return "true" if bool_ else "false"
 
 
 def _encode_connector_log(log: ConnectorLog) -> Any:
@@ -349,8 +350,19 @@ def _encode_connector_log(log: ConnectorLog) -> Any:
     }
 
 
-def _encode_date(date_: date) -> Any:
-    return f"{date_:%Y-%m-%d}"
+def _encode_date(year: int, month: int, day: int) -> Any:
+    return {"year": year, "month": month, "day": day}
+
+
+def _encode_date_time(time: DateTime) -> Any:
+    return {
+        "year": time.year,
+        "month": time.month,
+        "day": time.day,
+        "hour": time.hour,
+        "minute": time.minute,
+        "second": time.second,
+    }
 
 
 def _encode_datetime(datetime_: datetime) -> Any:
@@ -366,23 +378,18 @@ def _encode_domain_graph(graph: DomainGraph) -> Any:
     if graph.timestamp is None:
         return obj
     else:
-        history_timestamp = _encode_datetime(graph.timestamp)
+        history_timestamp = _encode_date_time(graph.timestamp)
         return {**obj, "historyTimestamp": history_timestamp}
 
 
 def _encode_entity(entity: Entity) -> Any:
     assignments = map(_encode_attribute_assignment, entity.attribute_assignments)
     return {
-        "active": entity.active,
         "attributeAssignments": assignments,
         "id": entity.id,
         "name": entity.name,
         "type": entity.type,
     }
-
-
-def _encode_float(float_: float) -> Any:
-    return f"{float_}"
 
 
 def _encode_level(level: Level) -> Any:
@@ -396,49 +403,37 @@ def _encode_relationship(relationship: Relationship) -> Any:
     assignments = map(_encode_attribute_assignment, relationship.attribute_assignments)
     return {
         "attributeAssignments": assignments,
-        "fromId": relationship.from_entity_id,
-        "toId": relationship.to_entity_id,
-        "fromType": relationship.from_entity_type,
-        "toType": relationship.to_entity_type,
+        "fromEntityId": relationship.from_entity_id,
+        "toEntityId": relationship.to_entity_id,
+        "fromEntityType": relationship.from_entity_type,
+        "toEntityType": relationship.to_entity_type,
     }
 
 
-def _encode_time(time_: time) -> Any:
-    datetime_ = datetime(
-        2000,
-        1,
-        1,
-        time_.hour,
-        time_.minute,
-        time_.second,
-        tzinfo=time_.tzinfo,
-    )
-    datetime__ = datetime_.astimezone(timezone.utc)
-    return f"{datetime__:%H:%M:%S}Z"
+def _encode_time(hour: int, minute: int, second: int) -> Any:
+    return {"hour": hour, "minute": minute, "second": second}
 
 
 def _encode_value(value: Value) -> Any:
     if isinstance(value, BooleanValue):
-        boolean_value = _encode_bool(value.value)
-        return {"type": "boolean", "value": boolean_value}
+        return {"type": "boolean", "value": value.value}
 
     elif isinstance(value, DateValue):
-        date_value = _encode_date(value.value)
+        date_value = _encode_date(value.year, value.month, value.day)
         return {"type": "date", "value": date_value}
 
     elif isinstance(value, DateTimeValue):
-        date_time_value = _encode_datetime(value.value)
+        date_time_value = _encode_date_time(value.value)
         return {"type": "dateTime", "value": date_time_value}
 
     elif isinstance(value, NumberValue):
-        number_value = _encode_float(value.value)
-        return {"type": "number", "value": number_value}
+        return {"type": "number", "value": value.value}
 
     elif isinstance(value, StringValue):
         return {"type": "string", "value": value.value}
 
     else:
-        time_value = _encode_time(value.value)
+        time_value = _encode_time(value.hour, value.minute, value.second)
         return {"type": "time", "value": time_value}
 
 
@@ -446,6 +441,8 @@ def _map(callable_: Callable[["_T"], "_U"], iterable: Any) -> List["_U"]:
     iterator = map(callable_, iterable)
     return list(iterator)
 
+
+_encoder = JSONEncoder(iterable_as_array=True)
 
 _T = TypeVar("_T")
 
