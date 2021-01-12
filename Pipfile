@@ -5,7 +5,6 @@ verify_ssl = true
 
 [dev-packages]
 black = "*"
-httpchunked = "*"
 pydocstyle = "*"
 
 [packages]

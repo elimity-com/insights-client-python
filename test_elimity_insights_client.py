@@ -1,16 +1,12 @@
 from contextlib import contextmanager
-from datetime import datetime, timezone, time
+from datetime import datetime, timezone
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from io import BytesIO
 from json import loads
-from os import devnull
 from threading import Thread
-from typing import BinaryIO, Any, Iterable
+from typing import Iterable
 from unittest import TestCase
 from zlib import decompress
-
-from httpchunked import decode
 
 from elimity_insights_client import (
     Client,
@@ -32,6 +28,7 @@ from elimity_insights_client import (
     Type,
     EntityType,
     RelationshipAttributeType,
+    DateTime,
 )
 
 
@@ -81,20 +78,17 @@ class TestClient(TestCase):
         graph = DomainGraph(
             entities=[
                 Entity(
-                    active=True,
                     attribute_assignments=[
                         AttributeAssignment(
                             attribute_type_name="foo", value=BooleanValue(True)
                         ),
                         AttributeAssignment(
                             attribute_type_name="bar",
-                            value=DateValue(datetime(2006, 1, 2)),
+                            value=DateValue(2006, 1, 2),
                         ),
                         AttributeAssignment(
                             attribute_type_name="baq",
-                            value=DateTimeValue(
-                                datetime(2006, 1, 2, 12, 4, 5, tzinfo=timezone.utc)
-                            ),
+                            value=DateTimeValue(DateTime(2006, 1, 2, 12, 4, 5)),
                         ),
                         AttributeAssignment(
                             attribute_type_name="baw", value=NumberValue(99)
@@ -108,11 +102,10 @@ class TestClient(TestCase):
                     type="baz",
                 ),
                 Entity(
-                    active=False,
                     attribute_assignments=[
                         AttributeAssignment(
                             attribute_type_name="baz",
-                            value=TimeValue(time(15, 4, 5, tzinfo=timezone.utc)),
+                            value=TimeValue(15, 4, 5),
                         )
                     ],
                     id="bar",
@@ -133,7 +126,7 @@ class TestClient(TestCase):
                     to_entity_type="foo",
                 )
             ],
-            timestamp=datetime(2001, 2, 3, 4, 5, 6, tzinfo=timezone.utc),
+            timestamp=DateTime(2001, 2, 3, 4, 5, 6),
         )
         with _create_client(_ReloadDomainGraphHandler) as client:
             client.reload_domain_graph(graph)
@@ -156,17 +149,7 @@ def _create_client(handler_class) -> Iterable[Client]:
         thread.join()
 
 
-def _decode(chunked: BinaryIO) -> Any:
-    buffer = BytesIO()
-    decode(buffer, chunked)
-    compressed = buffer.getvalue()
-    serialized = decompress(compressed)
-    return loads(serialized)
-
-
 class _CreateConnectorLogsHandler(BaseHTTPRequestHandler):
-    protocol_version = "HTTP/1.1"
-
     def do_POST(self) -> None:
         if self.path != "/api/custom-connector-logs":
             self.send_error(HTTPStatus.NOT_FOUND)
@@ -184,7 +167,8 @@ class _CreateConnectorLogsHandler(BaseHTTPRequestHandler):
                 "timestamp": "2020-10-31T23:55:00+00:00",
             },
         ]
-        actual = _decode(self.rfile)
+        actual_bytes = _read(self)
+        actual = loads(actual_bytes)
         if expected != actual:
             self.send_error(HTTPStatus.BAD_REQUEST)
             return
@@ -197,12 +181,7 @@ class _CreateConnectorLogsHandler(BaseHTTPRequestHandler):
 
 
 class _EncodeDatetimeHandler(BaseHTTPRequestHandler):
-    protocol_version = "HTTP/1.1"
-
     def do_POST(self) -> None:
-        with open(devnull, "bw") as file:
-            decode(file, self.rfile)
-
         self.send_response(HTTPStatus.NO_CONTENT)
         self.end_headers()
 
@@ -211,8 +190,6 @@ class _EncodeDatetimeHandler(BaseHTTPRequestHandler):
 
 
 class _GetDomainGraphSchemaHandler(BaseHTTPRequestHandler):
-    protocol_version = "HTTP/1.1"
-
     def do_GET(self) -> None:
         if self.path != "/api/domain-graph-schema":
             self.send_error(HTTPStatus.NOT_FOUND)
@@ -261,8 +238,6 @@ class _GetDomainGraphSchemaHandler(BaseHTTPRequestHandler):
 
 
 class _ReloadDomainGraphHandler(BaseHTTPRequestHandler):
-    protocol_version = "HTTP/1.1"
-
     def do_POST(self) -> None:
         if self.path != "/api/custom-connector-domain-graphs":
             self.send_error(HTTPStatus.NOT_FOUND)
@@ -271,26 +246,35 @@ class _ReloadDomainGraphHandler(BaseHTTPRequestHandler):
         expected = {
             "entities": [
                 {
-                    "active": True,
                     "attributeAssignments": [
                         {
                             "attributeTypeName": "foo",
-                            "value": {"type": "boolean", "value": "true"},
+                            "value": {"type": "boolean", "value": True},
                         },
                         {
                             "attributeTypeName": "bar",
-                            "value": {"type": "date", "value": "2006-01-02"},
+                            "value": {
+                                "type": "date",
+                                "value": {"year": 2006, "month": 1, "day": 2},
+                            },
                         },
                         {
                             "attributeTypeName": "baq",
                             "value": {
                                 "type": "dateTime",
-                                "value": "2006-01-02T12:04:05+00:00",
+                                "value": {
+                                    "year": 2006,
+                                    "month": 1,
+                                    "day": 2,
+                                    "hour": 12,
+                                    "minute": 4,
+                                    "second": 5,
+                                },
                             },
                         },
                         {
                             "attributeTypeName": "baw",
-                            "value": {"type": "number", "value": "99"},
+                            "value": {"type": "number", "value": 99},
                         },
                         {
                             "attributeTypeName": "bae",
@@ -302,11 +286,13 @@ class _ReloadDomainGraphHandler(BaseHTTPRequestHandler):
                     "type": "baz",
                 },
                 {
-                    "active": False,
                     "attributeAssignments": [
                         {
                             "attributeTypeName": "baz",
-                            "value": {"type": "time", "value": "15:04:05Z"},
+                            "value": {
+                                "type": "time",
+                                "value": {"hour": 15, "minute": 4, "second": 5},
+                            },
                         }
                     ],
                     "id": "bar",
@@ -322,15 +308,24 @@ class _ReloadDomainGraphHandler(BaseHTTPRequestHandler):
                             "value": {"type": "string", "value": "bar"},
                         }
                     ],
-                    "fromId": "foo",
-                    "fromType": "baz",
-                    "toId": "bar",
-                    "toType": "foo",
+                    "fromEntityId": "foo",
+                    "fromEntityType": "baz",
+                    "toEntityId": "bar",
+                    "toEntityType": "foo",
                 }
             ],
-            "historyTimestamp": "2001-02-03T04:05:06+00:00",
+            "historyTimestamp": {
+                "year": 2001,
+                "month": 2,
+                "day": 3,
+                "hour": 4,
+                "minute": 5,
+                "second": 6,
+            },
         }
-        actual = _decode(self.rfile)
+        actual_compressed_bytes = _read(self)
+        actual_bytes = decompress(actual_compressed_bytes)
+        actual = loads(actual_bytes)
         if expected != actual:
             self.send_error(HTTPStatus.BAD_REQUEST)
             return
@@ -340,3 +335,9 @@ class _ReloadDomainGraphHandler(BaseHTTPRequestHandler):
 
     def log_message(self, format, *args) -> None:
         pass
+
+
+def _read(handler: BaseHTTPRequestHandler) -> bytes:
+    content_length_string = handler.headers["Content-Length"]
+    content_length = int(content_length_string)
+    return handler.rfile.read(content_length)
