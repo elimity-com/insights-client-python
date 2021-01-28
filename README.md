@@ -31,4 +31,5 @@ $ pip install git+https://github.com/elimity-com/insights-client-python.git
 | Client version | Insights version |
 | -------------- | ---------------- |
 | 1              | 2.8 - 2.10       |
-| 2 - 3          | ^2.11            |
+| 2 - 3          | 2.11 - 3.0       |
+| 4              | ^3.1             |
