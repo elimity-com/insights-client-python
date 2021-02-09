@@ -59,12 +59,12 @@ class TestClient(TestCase):
             client.create_connector_logs(logs)
 
     def test_get_domain_graph_schema(self) -> None:
-        attribute_type = AttributeType(False, "foo", "bar", "baz", Type.STRING)
+        attribute_type = AttributeType(False, "foo", "bar", "bax", "baz", Type.STRING)
         attribute_types = [attribute_type]
         entity_type = EntityType("foo", "bar", "baz", "bax")
         entity_types = [entity_type]
         relationship_attribute_type = RelationshipAttributeType(
-            True, "bar", "bax", "baz", "foo", Type.DATE_TIME
+            True, "bar", "bax", "asd", "baz", "foo", Type.DATE_TIME
         )
         relationship_attribute_types = [relationship_attribute_type]
         expected = DomainGraphSchema(
@@ -80,21 +80,21 @@ class TestClient(TestCase):
                 Entity(
                     attribute_assignments=[
                         AttributeAssignment(
-                            attribute_type_name="foo", value=BooleanValue(True)
+                            attribute_type_id="foo", value=BooleanValue(True)
                         ),
                         AttributeAssignment(
-                            attribute_type_name="bar",
+                            attribute_type_id="bar",
                             value=DateValue(2006, 1, 2),
                         ),
                         AttributeAssignment(
-                            attribute_type_name="baq",
+                            attribute_type_id="baq",
                             value=DateTimeValue(DateTime(2006, 1, 2, 12, 4, 5)),
                         ),
                         AttributeAssignment(
-                            attribute_type_name="baw", value=NumberValue(99)
+                            attribute_type_id="baw", value=NumberValue(99)
                         ),
                         AttributeAssignment(
-                            attribute_type_name="bae", value=StringValue("bae string")
+                            attribute_type_id="bae", value=StringValue("bae string")
                         ),
                     ],
                     id="foo",
@@ -104,7 +104,7 @@ class TestClient(TestCase):
                 Entity(
                     attribute_assignments=[
                         AttributeAssignment(
-                            attribute_type_name="baz",
+                            attribute_type_id="baz",
                             value=TimeValue(15, 4, 5),
                         )
                     ],
@@ -117,7 +117,7 @@ class TestClient(TestCase):
                 Relationship(
                     attribute_assignments=[
                         AttributeAssignment(
-                            attribute_type_name="foo", value=StringValue("bar")
+                            attribute_type_id="foo", value=StringValue("bar")
                         ),
                     ],
                     from_entity_id="foo",
@@ -202,6 +202,7 @@ class _GetDomainGraphSchemaHandler(BaseHTTPRequestHandler):
             "archived": false,
             "description": "foo",
             "category": "bar",
+            "id": "bax",
             "name": "baz",
             "type": "string"
         }
@@ -219,6 +220,7 @@ class _GetDomainGraphSchemaHandler(BaseHTTPRequestHandler):
             "archived": true,
             "childType": "foo",
             "description": "bar",
+            "id": "asd",
             "name": "baz",
             "parentType": "bax",
             "type": "dateTime"
@@ -248,18 +250,18 @@ class _ReloadDomainGraphHandler(BaseHTTPRequestHandler):
                 {
                     "attributeAssignments": [
                         {
-                            "attributeTypeName": "foo",
+                            "attributeTypeId": "foo",
                             "value": {"type": "boolean", "value": True},
                         },
                         {
-                            "attributeTypeName": "bar",
+                            "attributeTypeId": "bar",
                             "value": {
                                 "type": "date",
                                 "value": {"year": 2006, "month": 1, "day": 2},
                             },
                         },
                         {
-                            "attributeTypeName": "baq",
+                            "attributeTypeId": "baq",
                             "value": {
                                 "type": "dateTime",
                                 "value": {
@@ -273,11 +275,11 @@ class _ReloadDomainGraphHandler(BaseHTTPRequestHandler):
                             },
                         },
                         {
-                            "attributeTypeName": "baw",
+                            "attributeTypeId": "baw",
                             "value": {"type": "number", "value": 99},
                         },
                         {
-                            "attributeTypeName": "bae",
+                            "attributeTypeId": "bae",
                             "value": {"type": "string", "value": "bae string"},
                         },
                     ],
@@ -288,7 +290,7 @@ class _ReloadDomainGraphHandler(BaseHTTPRequestHandler):
                 {
                     "attributeAssignments": [
                         {
-                            "attributeTypeName": "baz",
+                            "attributeTypeId": "baz",
                             "value": {
                                 "type": "time",
                                 "value": {"hour": 15, "minute": 4, "second": 5},
@@ -304,7 +306,7 @@ class _ReloadDomainGraphHandler(BaseHTTPRequestHandler):
                 {
                     "attributeAssignments": [
                         {
-                            "attributeTypeName": "foo",
+                            "attributeTypeId": "foo",
                             "value": {"type": "string", "value": "bar"},
                         }
                     ],

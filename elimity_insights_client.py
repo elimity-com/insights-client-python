@@ -20,7 +20,7 @@ from simplejson import JSONEncoder
 class AttributeAssignment:
     """Assignment of a value for an attribute type."""
 
-    attribute_type_name: str
+    attribute_type_id: str
     value: "Value"
 
 
@@ -31,6 +31,7 @@ class AttributeType:
     archived: bool
     description: str
     entity_type: str
+    id: str
     name: str
     type: "Type"
 
@@ -220,6 +221,7 @@ class RelationshipAttributeType:
     archived: bool
     description: str
     from_entity_type: str
+    id: str
     name: str
     to_entity_type: str
     type: "Type"
@@ -276,10 +278,11 @@ def _decode_attribute_type(json: Any) -> AttributeType:
     archived = json["archived"]
     description = json["description"]
     entity_type = json["category"]
+    id_ = json["id"]
     name = json["name"]
     type_ = json["type"]
     type__ = _decode_type(type_)
-    return AttributeType(archived, description, entity_type, name, type__)
+    return AttributeType(archived, description, entity_type, id_, name, type__)
 
 
 def _decode_domain_graph_schema(json: Any) -> DomainGraphSchema:
@@ -300,12 +303,13 @@ def _decode_relationship_attribute_types(json: Any) -> RelationshipAttributeType
     archived = json["archived"]
     description = json.get("description", "")
     from_entity_type = json["parentType"]
+    id_ = json["id"]
     name = json["name"]
     to_entity_type = json["childType"]
     type_ = json["type"]
     type__ = _decode_type(type_)
     return RelationshipAttributeType(
-        archived, description, from_entity_type, name, to_entity_type, type__
+        archived, description, from_entity_type, id_, name, to_entity_type, type__
     )
 
 
@@ -335,7 +339,7 @@ def _decode_type(json: Any) -> Type:
 def _encode_attribute_assignment(assignment: AttributeAssignment) -> Any:
     value = _encode_value(assignment.value)
     return {
-        "attributeTypeName": assignment.attribute_type_name,
+        "attributeTypeId": assignment.attribute_type_id,
         "value": value,
     }
 
