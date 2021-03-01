@@ -73,7 +73,13 @@ class Client:
         return _decode_domain_graph_schema(json)
 
     def reload_domain_graph(self, graph: "DomainGraph") -> None:
-        """Reload a domain graph."""
+        """
+        Reload a domain graph.
+
+        This method serializes the given domain graph by streaming its entities
+        and relationships to a compressed buffer. It always exhausts the given
+        domain graph's entities before iterating its relationships.
+        """
         json = _encode_domain_graph(graph)
         json_bytes_chunks = _compress_domain_graph(json)
         json_bytes = b"".join(json_bytes_chunks)
