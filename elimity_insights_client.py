@@ -7,6 +7,7 @@ being defined in the local system timezone.
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum, auto
+from itertools import chain
 from typing import Optional, Union, Any, Iterable, Tuple, Dict, TypeVar, Callable, List
 from zlib import compressobj
 
@@ -76,7 +77,8 @@ class Client:
         """Reload a domain graph."""
         json = _encode_domain_graph(graph)
         json_bytes_chunks = _compress_domain_graph(json)
-        json_bytes = b"".join(json_bytes_chunks)
+        json_bytes_iter = chain.from_iterable(json_bytes_chunks)
+        json_bytes = bytes(json_bytes_iter)
         self._post(
             "application/octet-stream", json_bytes, "custom-connector-domain-graphs"
         )
