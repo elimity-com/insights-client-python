@@ -191,6 +191,7 @@ class Entity:
 class EntityType:
     """Type of an entity."""
 
+    anonymized: bool
     icon: str
     key: str
     plural: str
@@ -322,11 +323,12 @@ def _decode_relationship_attribute_types(json: Any) -> RelationshipAttributeType
 
 
 def _decode_entity_type(json: Any) -> EntityType:
+    anonymized = json["anonymized"]
     icon = json["icon"]
     key = json["key"]
     plural = json["plural"]
     singular = json["singular"]
-    return EntityType(icon, key, plural, singular)
+    return EntityType(anonymized, icon, key, plural, singular)
 
 
 def _decode_type(json: Any) -> Type:

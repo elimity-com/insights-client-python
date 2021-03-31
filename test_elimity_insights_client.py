@@ -61,7 +61,7 @@ class TestClient(TestCase):
     def test_get_domain_graph_schema(self) -> None:
         attribute_type = AttributeType(False, "foo", "bar", "bax", "baz", Type.STRING)
         attribute_types = [attribute_type]
-        entity_type = EntityType("foo", "bar", "baz", "bax")
+        entity_type = EntityType(True, "foo", "bar", "baz", "bax")
         entity_types = [entity_type]
         relationship_attribute_type = RelationshipAttributeType(
             True, "bar", "bax", "asd", "baz", "foo", Type.DATE_TIME
@@ -209,6 +209,7 @@ class _GetDomainGraphSchemaHandler(BaseHTTPRequestHandler):
     ],
     "entityTypes": [
         {
+            "anonymized": true,
             "icon": "foo",
             "key": "bar",
             "plural": "baz",
