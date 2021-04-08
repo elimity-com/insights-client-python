@@ -211,7 +211,7 @@ class _GetDomainGraphSchemaHandler(BaseHTTPRequestHandler):
         {
             "anonymized": true,
             "icon": "foo",
-            "key": "bar",
+            "id": "bar",
             "plural": "baz",
             "singular": "bax"
         }
