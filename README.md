@@ -33,4 +33,5 @@ $ pip install git+https://github.com/elimity-com/insights-client-python.git
 | 1              | 2.8 - 2.10       |
 | 2 - 3          | 2.11 - 3.0       |
 | 4              | 3.1 - 3.3        |
-| 5 - 6          | ^3.4             |
+| 5 - 6          | 3.4 - 3.5        |
+| 7              | ^3.6             |
