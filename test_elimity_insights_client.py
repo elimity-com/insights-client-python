@@ -33,6 +33,11 @@ from elimity_insights_client import (
 
 
 class TestClient(TestCase):
+    def test_authentication(self) -> None:
+        logs = []
+        with _create_client(_AuthenticationHandler) as client:
+            client.create_connector_logs(logs)
+
     def test_create_connector_logs(self) -> None:
         logs = [
             ConnectorLog(
@@ -147,6 +152,20 @@ def _create_client(handler_class) -> Iterable[Client]:
         server.shutdown()
         server.server_close()
         thread.join()
+
+
+class _AuthenticationHandler(BaseHTTPRequestHandler):
+    def do_POST(self) -> None:
+        auth = self.headers["Authorization"]
+        if auth != "Basic NDI6Zm9v":
+            self.send_error(HTTPStatus.UNAUTHORIZED)
+            return
+
+        self.send_response(HTTPStatus.NO_CONTENT)
+        self.end_headers()
+
+    def log_message(self, format, *args):
+        pass
 
 
 class _CreateConnectorLogsHandler(BaseHTTPRequestHandler):
