@@ -33,6 +33,11 @@ from elimity_insights_client import (
 
 
 class TestClient(TestCase):
+    def test_authentication(self) -> None:
+        logs = []
+        with _create_client(_AuthenticationHandler) as client:
+            client.create_connector_logs(logs)
+
     def test_create_connector_logs(self) -> None:
         logs = [
             ConnectorLog(
@@ -140,7 +145,7 @@ def _create_client(handler_class) -> Iterable[Client]:
     thread.start()
 
     url = f"http://localhost:{server.server_port}"
-    config = Config(url=url, token="foo")
+    config = Config(id=42, url=url, token="foo")
     try:
         yield Client(config)
     finally:
@@ -149,9 +154,23 @@ def _create_client(handler_class) -> Iterable[Client]:
         thread.join()
 
 
+class _AuthenticationHandler(BaseHTTPRequestHandler):
+    def do_POST(self) -> None:
+        auth = self.headers["Authorization"]
+        if auth != "Basic NDI6Zm9v":
+            self.send_error(HTTPStatus.UNAUTHORIZED)
+            return
+
+        self.send_response(HTTPStatus.NO_CONTENT)
+        self.end_headers()
+
+    def log_message(self, format, *args):
+        pass
+
+
 class _CreateConnectorLogsHandler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:
-        if self.path != "/api/custom-connector-logs":
+        if self.path != "/api/custom-sources/42/connector-logs":
             self.send_error(HTTPStatus.NOT_FOUND)
             return
 
@@ -191,7 +210,7 @@ class _EncodeDatetimeHandler(BaseHTTPRequestHandler):
 
 class _GetDomainGraphSchemaHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
-        if self.path != "/api/domain-graph-schema":
+        if self.path != "/api/custom-sources/42/domain-graph-schema":
             self.send_error(HTTPStatus.NOT_FOUND)
             return
 
@@ -242,7 +261,7 @@ class _GetDomainGraphSchemaHandler(BaseHTTPRequestHandler):
 
 class _ReloadDomainGraphHandler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:
-        if self.path != "/api/custom-connector-domain-graphs":
+        if self.path != "/api/custom-sources/42/snapshots":
             self.send_error(HTTPStatus.NOT_FOUND)
             return
 
