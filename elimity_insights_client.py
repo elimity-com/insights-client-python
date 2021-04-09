@@ -64,12 +64,12 @@ class Client:
         json = map(_encode_connector_log, logs)
         json_string = _encoder.encode(json)
         json_bytes = json_string.encode()
-        self._post("application/json", json_bytes, "custom-connector-logs")
+        self._post("application/json", json_bytes, "connector-logs")
 
     def get_domain_graph_schema(self) -> "DomainGraphSchema":
         """Retrieve the domain graph schema."""
-        additional_headers = {}
-        response = self._request(additional_headers, None, "GET", "domain-graph-schema")
+        headers = {}
+        response = self._request(None, headers, "GET", "domain-graph-schema")
         json = response.json()
         return _decode_domain_graph_schema(json)
 
@@ -85,28 +85,32 @@ class Client:
         json_bytes_chunks = _compress_domain_graph(json)
         json_bytes_iter = chain.from_iterable(json_bytes_chunks)
         json_bytes = bytes(json_bytes_iter)
-        self._post(
-            "application/octet-stream", json_bytes, "custom-connector-domain-graphs"
-        )
+        self._post("application/octet-stream", json_bytes, "snapshots")
 
     def _post(self, content_type: str, data: bytes, path: str) -> None:
-        additional_headers = {"Content-Type": content_type}
-        self._request(additional_headers, data, "POST", path)
+        headers = {"Content-Type": content_type}
+        self._request(data, headers, "POST", path)
 
     def _request(
         self,
-        additional_headers: Dict[str, str],
         data: Optional[bytes],
+        headers: Dict[str, str],
         method: str,
         path: str,
     ) -> Response:
         config = self._config
-        url = f"{config.url}/api/{path}"
+        id_ = config.id
+        url = f"{config.url}/api/custom-sources/{id_}/{path}"
+        auth = str(id_), config.token
         cert = _cert(config.certificate)
-        authorization = f"Bearer {config.token}"
-        headers = {"Authorization": authorization, **additional_headers}
         response = request(
-            method, url, cert=cert, data=data, headers=headers, verify=config.verify_ssl
+            method,
+            url,
+            auth=auth,
+            cert=cert,
+            data=data,
+            headers=headers,
+            verify=config.verify_ssl,
         )
         response.raise_for_status()
         return response
@@ -116,6 +120,7 @@ class Client:
 class Config:
     """Configuration for an Elimity Insights client."""
 
+    id: int
     url: str
     token: str
     verify_ssl: bool = True
