@@ -220,7 +220,7 @@ class _GetDomainGraphSchemaHandler(BaseHTTPRequestHandler):
         {
             "archived": false,
             "description": "foo",
-            "category": "bar",
+            "entityTypeId": "bar",
             "id": "bax",
             "name": "baz",
             "type": "string"

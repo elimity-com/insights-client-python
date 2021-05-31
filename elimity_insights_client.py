@@ -291,7 +291,7 @@ def _compress_domain_graph(json: Any) -> Iterable[bytes]:
 def _decode_attribute_type(json: Any) -> AttributeType:
     archived = json["archived"]
     description = json["description"]
-    entity_type = json["category"]
+    entity_type = json["entityTypeId"]
     id_ = json["id"]
     name = json["name"]
     type_ = json["type"]
