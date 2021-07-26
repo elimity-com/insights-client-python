@@ -26,5 +26,5 @@ setup(
     python_requires=">=3.7",
     py_modules=["elimity_insights_client"],
     url="https://github.com/elimity-com/insights-client-python",
-    version="8.0.0a0",
+    version="8.0.0",
 )
