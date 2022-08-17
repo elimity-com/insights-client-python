@@ -23,7 +23,7 @@ if __name__ == "__main__":
 ## Installation
 
 ```sh
-$ pip install git+https://github.com/elimity-com/insights-client-python.git
+$ pip install elimity-insights-client
 ```
 
 ## Compatibility
