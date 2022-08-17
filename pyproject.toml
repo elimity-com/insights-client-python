@@ -1,0 +1,22 @@
+[build-system]
+requires = ["poetry_core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+authors = ["Elimity development team <dev@elimity.com>"]
+description = "Client for connector interactions with an Elimity Insights server"
+license = "Apache-2.0"
+name = "elimity-insights-client"
+readme = "README.md"
+repository = "https://github.com/elimity-com/insights-client-python"
+version = "8.1.0a0"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+python-dateutil = "^2.8.2"
+requests = "^2.28.1"
+simplejson = "^3.17.6"
+
+[tool.poetry.dev-dependencies]
+black = "^22.6.0"
+pydocstyle = "^6.1.1"

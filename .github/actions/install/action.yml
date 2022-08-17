@@ -2,8 +2,11 @@ description: Install dependencies
 name: Install
 runs:
   steps:
-    - run: pip install pipenv
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.10.4'
+    - run: pip install poetry==1.1.14
       shell: bash
-    - run: pipenv install --dev
+    - run: poetry install
       shell: bash
   using: composite

@@ -1,28 +1,30 @@
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: '3.7'
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/install
-      - run: pipenv run black --check .
-      - run: pipenv run pydocstyle
+      - run: poetry run black --check .
+      - run: poetry run pydocstyle
+
+  lock:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/install
+      - run: poetry lock --no-update
+      - run: git diff --quiet poetry.lock
 
   test:
     runs-on: ${{ matrix.runs-on }}
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: '3.7'
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/install
-      - run: pipenv run python -m unittest
+      - run: poetry run python -m unittest
     strategy:
       matrix:
         runs-on:
-          - ubuntu-latest
-          - windows-latest
+          - ubuntu-22.04
+          - windows-2022
 
 on: pull_request
