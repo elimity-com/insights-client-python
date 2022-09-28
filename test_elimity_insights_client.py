@@ -4,7 +4,7 @@ from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from json import loads
 from threading import Thread
-from typing import Iterable
+from typing import List, Type as TypingType, Iterator
 from unittest import TestCase
 from zlib import decompress
 
@@ -34,7 +34,7 @@ from elimity_insights_client import (
 
 class TestClient(TestCase):
     def test_authentication(self) -> None:
-        logs = []
+        logs: List[ConnectorLog] = []
         with _create_client(_AuthenticationHandler) as client:
             client.create_connector_logs(logs)
 
@@ -138,7 +138,9 @@ class TestClient(TestCase):
 
 
 @contextmanager
-def _create_client(handler_class) -> Iterable[Client]:
+def _create_client(
+    handler_class: TypingType[BaseHTTPRequestHandler],
+) -> Iterator[Client]:
     server_address = "", 0
     server = HTTPServer(server_address, handler_class)
     thread = Thread(target=server.serve_forever)
@@ -164,7 +166,7 @@ class _AuthenticationHandler(BaseHTTPRequestHandler):
         self.send_response(HTTPStatus.NO_CONTENT)
         self.end_headers()
 
-    def log_message(self, format, *args):
+    def log_message(self, format: object, *args: object) -> None:
         pass
 
 
@@ -195,7 +197,7 @@ class _CreateConnectorLogsHandler(BaseHTTPRequestHandler):
         self.send_response(HTTPStatus.NO_CONTENT)
         self.end_headers()
 
-    def log_message(self, format, *args):
+    def log_message(self, format: object, *args: object) -> None:
         pass
 
 
@@ -204,7 +206,7 @@ class _EncodeDatetimeHandler(BaseHTTPRequestHandler):
         self.send_response(HTTPStatus.NO_CONTENT)
         self.end_headers()
 
-    def log_message(self, format, *args) -> None:
+    def log_message(self, format: object, *args: object) -> None:
         pass
 
 
@@ -255,7 +257,7 @@ class _GetDomainGraphSchemaHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(schema)
 
-    def log_message(self, format, *args) -> None:
+    def log_message(self, format: object, *args: object) -> None:
         pass
 
 
@@ -355,7 +357,7 @@ class _ReloadDomainGraphHandler(BaseHTTPRequestHandler):
         self.send_response(HTTPStatus.NO_CONTENT)
         self.end_headers()
 
-    def log_message(self, format, *args) -> None:
+    def log_message(self, format: object, *args: object) -> None:
         pass
 
 
