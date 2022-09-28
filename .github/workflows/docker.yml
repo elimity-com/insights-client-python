@@ -1,0 +1,10 @@
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: docker login -p ${{ github.token }} -u ${{ github.actor }} ghcr.io
+      - run: docker build -t ghcr.io/elimity-com/insights-client-python .
+      - run: docker push ghcr.io/elimity-com/insights-client-python
+
+on: workflow_dispatch
