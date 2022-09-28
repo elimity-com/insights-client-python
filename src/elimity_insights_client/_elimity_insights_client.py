@@ -1,14 +1,9 @@
-"""
-Client for connector interactions with an Elimity Insights server.
-
-Note that this module interprets timestamps without timezone information as
-being defined in the local system timezone.
-"""
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum, auto
 from itertools import chain
 from typing import Optional, Union, Any, Iterable, Tuple, Dict, TypeVar, Callable, List
+from typing_extensions import TypedDict, NotRequired
 from zlib import compressobj
 
 from dateutil.tz import tzlocal
@@ -68,7 +63,7 @@ class Client:
 
     def get_domain_graph_schema(self) -> "DomainGraphSchema":
         """Retrieve the domain graph schema."""
-        headers = {}
+        headers: Dict[str, str] = {}
         response = self._request(None, headers, "GET", "domain-graph-schema")
         json = response.json()
         return _decode_domain_graph_schema(json)
@@ -273,22 +268,68 @@ class Type(Enum):
     TIME = auto()
 
 
-def _cert(certificate: Certificate) -> Optional[Tuple[str, str]]:
+_AttributeTypeDict = TypedDict(
+    "_AttributeTypeDict",
+    {
+        "archived": bool,
+        "description": str,
+        "entityTypeId": str,
+        "id": str,
+        "name": str,
+        "type": str,
+    },
+)
+
+_EntityTypeDict = TypedDict(
+    "_EntityTypeDict",
+    {
+        "anonymized": bool,
+        "icon": str,
+        "id": str,
+        "plural": str,
+        "singular": str,
+    },
+)
+
+_RelationshipAttributeTypeDict = TypedDict(
+    "_RelationshipAttributeTypeDict",
+    {
+        "archived": bool,
+        "childType": str,
+        "description": NotRequired[str],
+        "id": str,
+        "name": str,
+        "parentType": str,
+        "type": str,
+    },
+)
+
+_DomainGraphSchemaDict = TypedDict(
+    "_DomainGraphSchemaDict",
+    {
+        "entityAttributeTypes": List[_AttributeTypeDict],
+        "entityTypes": List[_EntityTypeDict],
+        "relationshipAttributeTypes": List[_RelationshipAttributeTypeDict],
+    },
+)
+
+
+def _cert(certificate: Optional[Certificate]) -> Optional[Tuple[str, str]]:
     if certificate is None:
         return None
     else:
         return certificate.certificate_path, certificate.private_key_path
 
 
-def _compress_domain_graph(json: Any) -> Iterable[bytes]:
+def _compress_domain_graph(json: object) -> Iterable[bytes]:
     compress = compressobj()
-    for json_string_chunk in _encoder.iterencode(json):
+    for json_string_chunk in _encoder.iterencode(json, False):
         json_bytes_chunk = json_string_chunk.encode()
         yield compress.compress(json_bytes_chunk)
     yield compress.flush()
 
 
-def _decode_attribute_type(json: Any) -> AttributeType:
+def _decode_attribute_type(json: _AttributeTypeDict) -> AttributeType:
     archived = json["archived"]
     description = json["description"]
     entity_type = json["entityTypeId"]
@@ -299,7 +340,7 @@ def _decode_attribute_type(json: Any) -> AttributeType:
     return AttributeType(archived, description, entity_type, id_, name, type__)
 
 
-def _decode_domain_graph_schema(json: Any) -> DomainGraphSchema:
+def _decode_domain_graph_schema(json: _DomainGraphSchemaDict) -> DomainGraphSchema:
     attribute_types = json["entityAttributeTypes"]
     attribute_types_ = _map(_decode_attribute_type, attribute_types)
     entity_types = json["entityTypes"]
@@ -313,7 +354,9 @@ def _decode_domain_graph_schema(json: Any) -> DomainGraphSchema:
     )
 
 
-def _decode_relationship_attribute_types(json: Any) -> RelationshipAttributeType:
+def _decode_relationship_attribute_types(
+    json: _RelationshipAttributeTypeDict,
+) -> RelationshipAttributeType:
     archived = json["archived"]
     description = json.get("description", "")
     from_entity_type = json["parentType"]
@@ -327,7 +370,7 @@ def _decode_relationship_attribute_types(json: Any) -> RelationshipAttributeType
     )
 
 
-def _decode_entity_type(json: Any) -> EntityType:
+def _decode_entity_type(json: _EntityTypeDict) -> EntityType:
     anonymized = json["anonymized"]
     icon = json["icon"]
     id = json["id"]
@@ -336,7 +379,7 @@ def _decode_entity_type(json: Any) -> EntityType:
     return EntityType(anonymized, icon, id, plural, singular)
 
 
-def _decode_type(json: Any) -> Type:
+def _decode_type(json: str) -> Type:
     if json == "boolean":
         return Type.BOOLEAN
     elif json == "date":
@@ -351,7 +394,7 @@ def _decode_type(json: Any) -> Type:
         return Type.TIME
 
 
-def _encode_attribute_assignment(assignment: AttributeAssignment) -> Any:
+def _encode_attribute_assignment(assignment: AttributeAssignment) -> object:
     value = _encode_value(assignment.value)
     return {
         "attributeTypeId": assignment.attribute_type_id,
@@ -359,7 +402,7 @@ def _encode_attribute_assignment(assignment: AttributeAssignment) -> Any:
     }
 
 
-def _encode_connector_log(log: ConnectorLog) -> Any:
+def _encode_connector_log(log: ConnectorLog) -> object:
     level = _encode_level(log.level)
     timestamp = _encode_datetime(log.timestamp)
     return {
@@ -369,11 +412,11 @@ def _encode_connector_log(log: ConnectorLog) -> Any:
     }
 
 
-def _encode_date(year: int, month: int, day: int) -> Any:
+def _encode_date(year: int, month: int, day: int) -> object:
     return {"year": year, "month": month, "day": day}
 
 
-def _encode_date_time(time: DateTime) -> Any:
+def _encode_date_time(time: DateTime) -> object:
     return {
         "year": time.year,
         "month": time.month,
@@ -384,13 +427,13 @@ def _encode_date_time(time: DateTime) -> Any:
     }
 
 
-def _encode_datetime(datetime_: datetime) -> Any:
+def _encode_datetime(datetime_: datetime) -> object:
     tzinfo = tzlocal()
     datetime__ = default_tzinfo(datetime_, tzinfo)
     return datetime__.isoformat()
 
 
-def _encode_domain_graph(graph: DomainGraph) -> Any:
+def _encode_domain_graph(graph: DomainGraph) -> object:
     entities = map(_encode_entity, graph.entities)
     relationships = map(_encode_relationship, graph.relationships)
     obj = {"entities": entities, "relationships": relationships}
@@ -401,7 +444,7 @@ def _encode_domain_graph(graph: DomainGraph) -> Any:
         return {**obj, "historyTimestamp": history_timestamp}
 
 
-def _encode_entity(entity: Entity) -> Any:
+def _encode_entity(entity: Entity) -> object:
     assignments = map(_encode_attribute_assignment, entity.attribute_assignments)
     return {
         "attributeAssignments": assignments,
@@ -411,14 +454,14 @@ def _encode_entity(entity: Entity) -> Any:
     }
 
 
-def _encode_level(level: Level) -> Any:
+def _encode_level(level: Level) -> object:
     if level == Level.ALERT:
         return "alert"
     else:
         return "info"
 
 
-def _encode_relationship(relationship: Relationship) -> Any:
+def _encode_relationship(relationship: Relationship) -> object:
     assignments = map(_encode_attribute_assignment, relationship.attribute_assignments)
     return {
         "attributeAssignments": assignments,
@@ -429,11 +472,11 @@ def _encode_relationship(relationship: Relationship) -> Any:
     }
 
 
-def _encode_time(hour: int, minute: int, second: int) -> Any:
+def _encode_time(hour: int, minute: int, second: int) -> object:
     return {"hour": hour, "minute": minute, "second": second}
 
 
-def _encode_value(value: Value) -> Any:
+def _encode_value(value: Value) -> object:
     if isinstance(value, BooleanValue):
         return {"type": "boolean", "value": value.value}
 
@@ -456,7 +499,7 @@ def _encode_value(value: Value) -> Any:
         return {"type": "time", "value": time_value}
 
 
-def _map(callable_: Callable[["_T"], "_U"], iterable: Any) -> List["_U"]:
+def _map(callable_: Callable[["_T"], "_U"], iterable: List["_T"]) -> List["_U"]:
     iterator = map(callable_, iterable)
     return list(iterator)
 
