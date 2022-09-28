@@ -1,0 +1,26 @@
+jobs:
+  lint:
+    container: ghcr.io/elimity-com/insights-client-python
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: /root/.local/bin/poetry install
+      - run: /root/.local/bin/poetry run black --check .
+      - run: /root/.local/bin/poetry run pydocstyle
+
+  lock:
+    container: ghcr.io/elimity-com/insights-client-python
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: /root/.local/bin/poetry lock --check
+
+  test:
+    container: ghcr.io/elimity-com/insights-client-python
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: /root/.local/bin/poetry install
+      - run: /root/.local/bin/poetry run python -m unittest
+
+on: pull_request
