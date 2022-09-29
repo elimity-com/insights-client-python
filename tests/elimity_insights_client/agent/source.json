@@ -1,0 +1,28 @@
+{
+  "archived": true,
+  "domainGraphSchema": {
+    "entityAttributeTypes": [
+      {
+        "archived": false,
+        "description": "baz",
+        "entityTypeId": "foo",
+        "id": "foo",
+        "name": "bar",
+        "type": "string"
+      }
+    ],
+    "entityTypes": [
+      {
+        "anonymized": true,
+        "icon": "baz",
+        "id": "foo",
+        "plural": "bars",
+        "singular": "bar"
+      }
+    ],
+    "relationshipAttributeTypes": []
+  },
+  "id": 42,
+  "lastReloadTimestamp": "2006-05-04T03:02:01+07:00",
+  "name": "foo"
+}

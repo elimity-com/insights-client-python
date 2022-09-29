@@ -2,14 +2,18 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum, auto
 from itertools import chain
-from typing import Optional, Union, Any, Iterable, Tuple, Dict, TypeVar, Callable, List
-from typing_extensions import TypedDict, NotRequired
+from typing import Optional, Union, Iterable, Tuple, Dict
 from zlib import compressobj
 
-from dateutil.tz import tzlocal
-from dateutil.utils import default_tzinfo
 from requests import request, Response
-from simplejson import JSONEncoder
+
+from elimity_insights_client._decode_domain_graph_schema import (
+    decode_domain_graph_schema,
+)
+from elimity_insights_client._domain_graph_schema import (
+    DomainGraphSchema,
+)
+from elimity_insights_client._util import encode_datetime, encoder
 
 
 @dataclass
@@ -18,18 +22,6 @@ class AttributeAssignment:
 
     attribute_type_id: str
     value: "Value"
-
-
-@dataclass
-class AttributeType:
-    """Attribute type for an entity type."""
-
-    archived: bool
-    description: str
-    entity_type: str
-    id: str
-    name: str
-    type: "Type"
 
 
 @dataclass
@@ -57,7 +49,7 @@ class Client:
     def create_connector_logs(self, logs: Iterable["ConnectorLog"]) -> None:
         """Create connector logs."""
         json = map(_encode_connector_log, logs)
-        json_string = _encoder.encode(json)
+        json_string = encoder.encode(json)
         json_bytes = json_string.encode()
         self._post("application/json", json_bytes, "connector-logs")
 
@@ -66,7 +58,7 @@ class Client:
         headers: Dict[str, str] = {}
         response = self._request(None, headers, "GET", "domain-graph-schema")
         json = response.json()
-        return _decode_domain_graph_schema(json)
+        return decode_domain_graph_schema(json)
 
     def reload_domain_graph(self, graph: "DomainGraph") -> None:
         """
@@ -169,15 +161,6 @@ class DomainGraph:
 
 
 @dataclass
-class DomainGraphSchema:
-    """Schema determining valid domain graphs."""
-
-    attribute_types: List[AttributeType]
-    entity_types: List["EntityType"]
-    relationship_attribute_types: List["RelationshipAttributeType"]
-
-
-@dataclass
 class Entity:
     """Entity of a specific type, including attribute assignments."""
 
@@ -185,17 +168,6 @@ class Entity:
     id: str
     name: str
     type: str
-
-
-@dataclass
-class EntityType:
-    """Type of an entity."""
-
-    anonymized: bool
-    icon: str
-    id: str
-    plural: str
-    singular: str
 
 
 class Level(Enum):
@@ -224,19 +196,6 @@ class Relationship:
 
 
 @dataclass
-class RelationshipAttributeType:
-    """Attribute type for relationships between entities of specific types."""
-
-    archived: bool
-    description: str
-    from_entity_type: str
-    id: str
-    name: str
-    to_entity_type: str
-    type: "Type"
-
-
-@dataclass
 class StringValue:
     """Value to assign for a string attribute type."""
 
@@ -257,63 +216,6 @@ Value = Union[
 ]
 
 
-class Type(Enum):
-    """Type of an attribute type, determining valid assignment values."""
-
-    BOOLEAN = auto()
-    DATE = auto()
-    DATE_TIME = auto()
-    NUMBER = auto()
-    STRING = auto()
-    TIME = auto()
-
-
-_AttributeTypeDict = TypedDict(
-    "_AttributeTypeDict",
-    {
-        "archived": bool,
-        "description": str,
-        "entityTypeId": str,
-        "id": str,
-        "name": str,
-        "type": str,
-    },
-)
-
-_EntityTypeDict = TypedDict(
-    "_EntityTypeDict",
-    {
-        "anonymized": bool,
-        "icon": str,
-        "id": str,
-        "plural": str,
-        "singular": str,
-    },
-)
-
-_RelationshipAttributeTypeDict = TypedDict(
-    "_RelationshipAttributeTypeDict",
-    {
-        "archived": bool,
-        "childType": str,
-        "description": NotRequired[str],
-        "id": str,
-        "name": str,
-        "parentType": str,
-        "type": str,
-    },
-)
-
-_DomainGraphSchemaDict = TypedDict(
-    "_DomainGraphSchemaDict",
-    {
-        "entityAttributeTypes": List[_AttributeTypeDict],
-        "entityTypes": List[_EntityTypeDict],
-        "relationshipAttributeTypes": List[_RelationshipAttributeTypeDict],
-    },
-)
-
-
 def _cert(certificate: Optional[Certificate]) -> Optional[Tuple[str, str]]:
     if certificate is None:
         return None
@@ -323,75 +225,10 @@ def _cert(certificate: Optional[Certificate]) -> Optional[Tuple[str, str]]:
 
 def _compress_domain_graph(json: object) -> Iterable[bytes]:
     compress = compressobj()
-    for json_string_chunk in _encoder.iterencode(json, False):
+    for json_string_chunk in encoder.iterencode(json, False):
         json_bytes_chunk = json_string_chunk.encode()
         yield compress.compress(json_bytes_chunk)
     yield compress.flush()
-
-
-def _decode_attribute_type(json: _AttributeTypeDict) -> AttributeType:
-    archived = json["archived"]
-    description = json["description"]
-    entity_type = json["entityTypeId"]
-    id_ = json["id"]
-    name = json["name"]
-    type_ = json["type"]
-    type__ = _decode_type(type_)
-    return AttributeType(archived, description, entity_type, id_, name, type__)
-
-
-def _decode_domain_graph_schema(json: _DomainGraphSchemaDict) -> DomainGraphSchema:
-    attribute_types = json["entityAttributeTypes"]
-    attribute_types_ = _map(_decode_attribute_type, attribute_types)
-    entity_types = json["entityTypes"]
-    entity_types_ = _map(_decode_entity_type, entity_types)
-    relationship_attribute_types = json["relationshipAttributeTypes"]
-    relationship_attribute_types_ = _map(
-        _decode_relationship_attribute_types, relationship_attribute_types
-    )
-    return DomainGraphSchema(
-        attribute_types_, entity_types_, relationship_attribute_types_
-    )
-
-
-def _decode_relationship_attribute_types(
-    json: _RelationshipAttributeTypeDict,
-) -> RelationshipAttributeType:
-    archived = json["archived"]
-    description = json.get("description", "")
-    from_entity_type = json["parentType"]
-    id_ = json["id"]
-    name = json["name"]
-    to_entity_type = json["childType"]
-    type_ = json["type"]
-    type__ = _decode_type(type_)
-    return RelationshipAttributeType(
-        archived, description, from_entity_type, id_, name, to_entity_type, type__
-    )
-
-
-def _decode_entity_type(json: _EntityTypeDict) -> EntityType:
-    anonymized = json["anonymized"]
-    icon = json["icon"]
-    id = json["id"]
-    plural = json["plural"]
-    singular = json["singular"]
-    return EntityType(anonymized, icon, id, plural, singular)
-
-
-def _decode_type(json: str) -> Type:
-    if json == "boolean":
-        return Type.BOOLEAN
-    elif json == "date":
-        return Type.DATE
-    elif json == "dateTime":
-        return Type.DATE_TIME
-    elif json == "number":
-        return Type.NUMBER
-    elif json == "string":
-        return Type.STRING
-    else:
-        return Type.TIME
 
 
 def _encode_attribute_assignment(assignment: AttributeAssignment) -> object:
@@ -404,7 +241,7 @@ def _encode_attribute_assignment(assignment: AttributeAssignment) -> object:
 
 def _encode_connector_log(log: ConnectorLog) -> object:
     level = _encode_level(log.level)
-    timestamp = _encode_datetime(log.timestamp)
+    timestamp = encode_datetime(log.timestamp)
     return {
         "level": level,
         "message": log.message,
@@ -425,12 +262,6 @@ def _encode_date_time(time: DateTime) -> object:
         "minute": time.minute,
         "second": time.second,
     }
-
-
-def _encode_datetime(datetime_: datetime) -> object:
-    tzinfo = tzlocal()
-    datetime__ = default_tzinfo(datetime_, tzinfo)
-    return datetime__.isoformat()
 
 
 def _encode_domain_graph(graph: DomainGraph) -> object:
@@ -497,15 +328,3 @@ def _encode_value(value: Value) -> object:
     else:
         time_value = _encode_time(value.hour, value.minute, value.second)
         return {"type": "time", "value": time_value}
-
-
-def _map(callable_: Callable[["_T"], "_U"], iterable: List["_T"]) -> List["_U"]:
-    iterator = map(callable_, iterable)
-    return list(iterator)
-
-
-_encoder = JSONEncoder(iterable_as_array=True)
-
-_T = TypeVar("_T")
-
-_U = TypeVar("_U")
