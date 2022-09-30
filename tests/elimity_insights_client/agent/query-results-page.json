@@ -1,0 +1,39 @@
+{
+  "count": 1,
+  "results": [
+    {
+      "entity": {
+        "active": true,
+        "id": "bar",
+        "name": "foo"
+      },
+      "inclusions": [
+        {
+          "type": "boolean",
+          "value": "false"
+        }
+      ],
+      "linkGroupByPages": [
+        {
+          "groupCount": 1,
+          "results": [
+            {
+              "count": 0,
+              "label": {
+                "type": "number",
+                "value": "42"
+              },
+              "subPages": []
+            }
+          ]
+        }
+      ],
+      "linkPages": [
+        {
+          "count": 0,
+          "results": []
+        }
+      ]
+    }
+  ]
+}

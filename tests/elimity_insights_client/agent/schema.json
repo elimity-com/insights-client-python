@@ -1,0 +1,1195 @@
+{
+  "definitions": {
+    "activeBooleanExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "reference": {
+          "type": "string"
+        },
+        "type": {
+          "const": "active"
+        }
+      },
+      "required": [
+        "reference",
+        "type"
+      ],
+      "type": "object"
+    },
+    "aggregateOperator": {
+      "enum": [
+        "avg",
+        "count",
+        "max",
+        "min",
+        "sum"
+      ]
+    },
+    "allBooleanExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "exprs": {
+          "items": {
+            "$ref": "#/definitions/booleanExpression"
+          },
+          "type": "array"
+        },
+        "type": {
+          "const": "all"
+        }
+      },
+      "required": [
+        "exprs",
+        "type"
+      ],
+      "type": "object"
+    },
+    "anyBooleanExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "exprs": {
+          "items": {
+            "$ref": "#/definitions/booleanExpression"
+          }
+        },
+        "type": {
+          "const": "any"
+        }
+      },
+      "required": [
+        "exprs",
+        "type"
+      ],
+      "type": "object"
+    },
+    "anyExpression": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/booleanAnyExpression"
+        },
+        {
+          "$ref": "#/definitions/dateAnyExpression"
+        },
+        {
+          "$ref": "#/definitions/dateTimeAnyExpression"
+        },
+        {
+          "$ref": "#/definitions/numberAnyExpression"
+        },
+        {
+          "$ref": "#/definitions/stringAnyExpression"
+        },
+        {
+          "$ref": "#/definitions/timeAnyExpression"
+        }
+      ]
+    },
+    "assignedBooleanExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "attributeType": {
+          "type": "string"
+        },
+        "reference": {
+          "type": "string"
+        },
+        "type": {
+          "const": "assigned"
+        }
+      },
+      "required": [
+        "attributeType",
+        "reference",
+        "type"
+      ],
+      "type": "object"
+    },
+    "attributeExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "attributeType": {
+          "type": "string"
+        },
+        "reference": {
+          "type": "string"
+        },
+        "type": {
+          "const": "attribute"
+        }
+      },
+      "required": [
+        "attributeType",
+        "reference",
+        "type"
+      ],
+      "type": "object"
+    },
+    "booleanAnyExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "expr": {
+          "$ref": "#/definitions/booleanExpression"
+        },
+        "type": {
+          "const": "boolean"
+        }
+      },
+      "required": [
+        "expr",
+        "type"
+      ],
+      "type": "object"
+    },
+    "booleanExpression": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/activeBooleanExpression"
+        },
+        {
+          "$ref": "#/definitions/allBooleanExpression"
+        },
+        {
+          "$ref": "#/definitions/anyBooleanExpression"
+        },
+        {
+          "$ref": "#/definitions/assignedBooleanExpression"
+        },
+        {
+          "$ref": "#/definitions/attributeExpression"
+        },
+        {
+          "$ref": "#/definitions/dateCmpBooleanExpression"
+        },
+        {
+          "$ref": "#/definitions/dateTimeCmpBooleanExpression"
+        },
+        {
+          "$ref": "#/definitions/directlyLinkedToBooleanExpression"
+        },
+        {
+          "$ref": "#/definitions/idInBooleanExpression"
+        },
+        {
+          "$ref": "#/definitions/linkAssignedBooleanExpression"
+        },
+        {
+          "$ref": "#/definitions/linkAttributeExpression"
+        },
+        {
+          "$ref": "#/definitions/linkedToBooleanExpression"
+        },
+        {
+          "$ref": "#/definitions/literalBooleanExpression"
+        },
+        {
+          "$ref": "#/definitions/matchBooleanExpression"
+        },
+        {
+          "$ref": "#/definitions/notBooleanExpression"
+        },
+        {
+          "$ref": "#/definitions/numberCmpBooleanExpression"
+        },
+        {
+          "$ref": "#/definitions/timeCmpBooleanExpression"
+        }
+      ]
+    },
+    "cmpOperator": {
+      "enum": [
+        "eq",
+        "gt",
+        "gte",
+        "lt",
+        "lte",
+        "neq"
+      ]
+    },
+    "dateAnyExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "expr": {
+          "$ref": "#/definitions/dateExpression"
+        },
+        "type": {
+          "const": "date"
+        }
+      },
+      "required": [
+        "expr",
+        "type"
+      ],
+      "type": "object"
+    },
+    "dateCmpBooleanExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "lhs": {
+          "$ref": "#/definitions/dateExpression"
+        },
+        "operator": {
+          "$ref": "#/definitions/cmpOperator"
+        },
+        "rhs": {
+          "$ref": "#/definitions/dateExpression"
+        },
+        "type": {
+          "const": "dateCmp"
+        }
+      },
+      "required": [
+        "lhs",
+        "operator",
+        "rhs",
+        "type"
+      ],
+      "type": "object"
+    },
+    "dateExpression": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/attributeExpression"
+        },
+        {
+          "$ref": "#/definitions/linkAttributeExpression"
+        },
+        {
+          "$ref": "#/definitions/literalDateExpression"
+        },
+        {
+          "$ref": "#/definitions/relativeDateExpression"
+        }
+      ]
+    },
+    "dateTimeAnyExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "expr": {
+          "$ref": "#/definitions/dateTimeExpression"
+        },
+        "type": {
+          "const": "dateTime"
+        }
+      },
+      "required": [
+        "expr",
+        "type"
+      ],
+      "type": "object"
+    },
+    "dateTimeCmpBooleanExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "lhs": {
+          "$ref": "#/definitions/dateTimeExpression"
+        },
+        "operator": {
+          "$ref": "#/definitions/cmpOperator"
+        },
+        "rhs": {
+          "$ref": "#/definitions/dateTimeExpression"
+        },
+        "type": {
+          "const": "dateTimeCmp"
+        }
+      },
+      "required": [
+        "lhs",
+        "operator",
+        "rhs",
+        "type"
+      ],
+      "type": "object"
+    },
+    "dateTimeExpression": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/attributeExpression"
+        },
+        {
+          "$ref": "#/definitions/linkAttributeExpression"
+        },
+        {
+          "$ref": "#/definitions/literalDateTimeExpression"
+        },
+        {
+          "$ref": "#/definitions/relativeDateTimeExpression"
+        }
+      ]
+    },
+    "directLinkAggregateNumberExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "alias": {
+          "type": "string"
+        },
+        "condition": {
+          "$ref": "#/definitions/booleanExpression"
+        },
+        "entityType": {
+          "type": "string"
+        },
+        "expr": {
+          "$ref": "#/definitions/numberExpression"
+        },
+        "linkAlias": {
+          "type": "string"
+        },
+        "op": {
+          "$ref": "#/definitions/aggregateOperator"
+        },
+        "type": {
+          "const": "directLinkAggregate"
+        },
+        "sourceId": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "alias",
+        "condition",
+        "entityType",
+        "expr",
+        "linkAlias",
+        "op",
+        "type",
+        "sourceId"
+      ],
+      "type": "object"
+    },
+    "directLinkGroupByQueries": {
+      "items": {
+        "$ref": "#/definitions/directLinkGroupByQuery"
+      },
+      "type": "array"
+    },
+    "directLinkGroupByQuery": {
+      "additionalProperties": false,
+      "properties": {
+        "alias": {
+          "type": "string"
+        },
+        "condition": {
+          "$ref": "#/definitions/booleanExpression"
+        },
+        "entityType": {
+          "type": "string"
+        },
+        "groupBy": {
+          "$ref": "#/definitions/groupings"
+        },
+        "linkAlias": {
+          "type": "string"
+        },
+        "sourceId": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "alias",
+        "condition",
+        "entityType",
+        "groupBy",
+        "linkAlias",
+        "sourceId"
+      ],
+      "type": "object"
+    },
+    "directLinkQueries": {
+      "items": {
+        "$ref": "#/definitions/directLinkQuery"
+      },
+      "type": "array"
+    },
+    "directLinkQuery": {
+      "additionalProperties": false,
+      "properties": {
+        "alias": {
+          "type": "string"
+        },
+        "condition": {
+          "$ref": "#/definitions/booleanExpression"
+        },
+        "directLinkGroupByQueries": {
+          "$ref": "#/definitions/directLinkGroupByQueries"
+        },
+        "directLinkQueries": {
+          "$ref": "#/definitions/directLinkQueries"
+        },
+        "entityType": {
+          "type": "string"
+        },
+        "include": {
+          "$ref": "#/definitions/inclusions"
+        },
+        "limit": {
+          "type": "integer"
+        },
+        "linkAlias": {
+          "type": "string"
+        },
+        "linkGroupByQueries": {
+          "$ref": "#/definitions/linkGroupByQueries"
+        },
+        "linkQueries": {
+          "$ref": "#/definitions/linkQueries"
+        },
+        "offset": {
+          "type": "integer"
+        },
+        "orderBy": {
+          "$ref": "#/definitions/orderings"
+        },
+        "sourceId": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "alias",
+        "condition",
+        "directLinkGroupByQueries",
+        "directLinkQueries",
+        "entityType",
+        "include",
+        "limit",
+        "linkAlias",
+        "linkGroupByQueries",
+        "linkQueries",
+        "offset",
+        "orderBy",
+        "sourceId"
+      ],
+      "type": "object"
+    },
+    "directlyLinkedToBooleanExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "alias": {
+          "type": "string"
+        },
+        "condition": {
+          "$ref": "#/definitions/booleanExpression"
+        },
+        "entityType": {
+          "type": "string"
+        },
+        "linkAlias": {
+          "type": "string"
+        },
+        "type": {
+          "const": "directlyLinkedTo"
+        },
+        "sourceId": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "alias",
+        "condition",
+        "entityType",
+        "linkAlias",
+        "type",
+        "sourceId"
+      ],
+      "type": "object"
+    },
+    "grouping": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "$ref": "#/definitions/anyExpression"
+        },
+        "ordering": {
+          "$ref": "#/definitions/groupOrdering"
+        }
+      },
+      "required": [
+        "key",
+        "ordering"
+      ],
+      "type": "object"
+    },
+    "groupings": {
+      "items": {
+        "$ref": "#/definitions/grouping"
+      },
+      "type": "array"
+    },
+    "groupOrdering": {
+      "additionalProperties": false,
+      "properties": {
+        "direction": {
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        },
+        "type": {
+          "enum": [
+            "count",
+            "label",
+            "none"
+          ]
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    },
+    "idInBooleanExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "ids": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "reference": {
+          "type": "string"
+        },
+        "type": {
+          "const": "idInBooleanExpression"
+        }
+      },
+      "required": [
+        "ids",
+        "reference",
+        "type"
+      ]
+    },
+    "idStringExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "reference": {
+          "type": "string"
+        },
+        "type": {
+          "const": "id"
+        }
+      },
+      "required": [
+        "reference",
+        "type"
+      ],
+      "type": "object"
+    },
+    "inclusions": {
+      "items": {
+        "$ref": "#/definitions/anyExpression"
+      },
+      "type": "array"
+    },
+    "linkAggregateNumberExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "alias": {
+          "type": "string"
+        },
+        "condition": {
+          "$ref": "#/definitions/booleanExpression"
+        },
+        "entityType": {
+          "type": "string"
+        },
+        "expr": {
+          "$ref": "#/definitions/numberExpression"
+        },
+        "op": {
+          "$ref": "#/definitions/aggregateOperator"
+        },
+        "type": {
+          "const": "linkAggregate"
+        },
+        "sourceId": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "alias",
+        "condition",
+        "entityType",
+        "expr",
+        "op",
+        "type",
+        "sourceId"
+      ],
+      "type": "object"
+    },
+    "linkAssignedBooleanExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "linkAttributeType": {
+          "type": "string"
+        },
+        "linkReference": {
+          "type": "string"
+        },
+        "type": {
+          "const": "linkAssigned"
+        }
+      },
+      "required": [
+        "linkAttributeType",
+        "linkReference",
+        "type"
+      ],
+      "type": "object"
+    },
+    "linkAttributeExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "linkAttributeType": {
+          "type": "string"
+        },
+        "linkReference": {
+          "type": "string"
+        },
+        "type": {
+          "const": "linkAttribute"
+        }
+      },
+      "required": [
+        "linkAttributeType",
+        "linkReference",
+        "type"
+      ],
+      "type": "object"
+    },
+    "linkedToBooleanExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "alias": {
+          "type": "string"
+        },
+        "condition": {
+          "$ref": "#/definitions/booleanExpression"
+        },
+        "entityType": {
+          "type": "string"
+        },
+        "type": {
+          "const": "linkedTo"
+        },
+        "sourceId": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "alias",
+        "condition",
+        "entityType",
+        "type",
+        "sourceId"
+      ],
+      "type": "object"
+    },
+    "linkGroupByQueries": {
+      "items": {
+        "$ref": "#/definitions/linkGroupByQuery"
+      },
+      "type": "array"
+    },
+    "linkGroupByQuery": {
+      "additionalProperties": false,
+      "properties": {
+        "alias": {
+          "type": "string"
+        },
+        "condition": {
+          "$ref": "#/definitions/booleanExpression"
+        },
+        "entityType": {
+          "type": "string"
+        },
+        "groupBy": {
+          "$ref": "#/definitions/groupings"
+        },
+        "sourceId": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "alias",
+        "condition",
+        "entityType",
+        "groupBy",
+        "sourceId"
+      ],
+      "type": "object"
+    },
+    "linkQueries": {
+      "items": {
+        "$ref": "#"
+      },
+      "type": "array"
+    },
+    "literalBooleanExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "boolean": {
+          "type": "boolean"
+        },
+        "type": {
+          "const": "literal"
+        }
+      },
+      "required": [
+        "boolean",
+        "type"
+      ],
+      "type": "object"
+    },
+    "literalDateExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "date": {
+          "format": "date",
+          "type": "string"
+        },
+        "type": {
+          "const": "literal"
+        }
+      },
+      "required": [
+        "date",
+        "type"
+      ],
+      "type": "object"
+    },
+    "literalDateTimeExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "dateTime": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "type": {
+          "const": "literal"
+        }
+      },
+      "required": [
+        "dateTime",
+        "type"
+      ],
+      "type": "object"
+    },
+    "literalNumberExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "number": {
+          "type": "number"
+        },
+        "type": {
+          "const": "literal"
+        }
+      },
+      "required": [
+        "number",
+        "type"
+      ],
+      "type": "object"
+    },
+    "literalStringExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "string": {
+          "type": "string"
+        },
+        "type": {
+          "const": "literal"
+        }
+      },
+      "required": [
+        "string",
+        "type"
+      ],
+      "type": "object"
+    },
+    "literalTimeExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "time": {
+          "format": "time",
+          "type": "string"
+        },
+        "type": {
+          "const": "literal"
+        }
+      },
+      "required": [
+        "time",
+        "type"
+      ],
+      "type": "object"
+    },
+    "matchBooleanExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "lhs": {
+          "$ref": "#/definitions/stringExpression"
+        },
+        "mode": {
+          "$ref": "#/definitions/matchMode"
+        },
+        "operator": {
+          "$ref": "#/definitions/matchOperator"
+        },
+        "rhs": {
+          "$ref": "#/definitions/stringExpression"
+        },
+        "type": {
+          "const": "match"
+        }
+      },
+      "required": [
+        "lhs",
+        "mode",
+        "operator",
+        "rhs",
+        "type"
+      ],
+      "type": "object"
+    },
+    "matchMode": {
+      "enum": [
+        "caseInsensitive",
+        "caseSensitive"
+      ]
+    },
+    "matchOperator": {
+      "enum": [
+        "contains",
+        "endsWith",
+        "equals",
+        "startsWith"
+      ]
+    },
+    "nameStringExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "reference": {
+          "type": "string"
+        },
+        "type": {
+          "const": "name"
+        }
+      },
+      "required": [
+        "reference",
+        "type"
+      ],
+      "type": "object"
+    },
+    "notBooleanExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "expr": {
+          "$ref": "#/definitions/booleanExpression"
+        },
+        "type": {
+          "const": "not"
+        }
+      },
+      "required": [
+        "expr",
+        "type"
+      ],
+      "type": "object"
+    },
+    "numberAnyExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "expr": {
+          "$ref": "#/definitions/numberExpression"
+        },
+        "type": {
+          "const": "number"
+        }
+      },
+      "required": [
+        "expr",
+        "type"
+      ],
+      "type": "object"
+    },
+    "numberCmpBooleanExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "lhs": {
+          "$ref": "#/definitions/numberExpression"
+        },
+        "operator": {
+          "$ref": "#/definitions/cmpOperator"
+        },
+        "rhs": {
+          "$ref": "#/definitions/numberExpression"
+        },
+        "type": {
+          "const": "numberCmp"
+        }
+      },
+      "required": [
+        "lhs",
+        "operator",
+        "rhs",
+        "type"
+      ],
+      "type": "object"
+    },
+    "numberExpression": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/attributeExpression"
+        },
+        {
+          "$ref": "#/definitions/directLinkAggregateNumberExpression"
+        },
+        {
+          "$ref": "#/definitions/linkAggregateNumberExpression"
+        },
+        {
+          "$ref": "#/definitions/linkAttributeExpression"
+        },
+        {
+          "$ref": "#/definitions/literalNumberExpression"
+        }
+      ]
+    },
+    "ordering": {
+      "additionalProperties": false,
+      "properties": {
+        "anyExpression": {
+          "$ref": "#/definitions/anyExpression"
+        },
+        "direction": {
+          "enum": [
+            "asc",
+            "desc"
+          ]
+        }
+      },
+      "required": [
+        "anyExpression",
+        "direction"
+      ],
+      "type": "object"
+    },
+    "orderings": {
+      "items": {
+        "$ref": "#/definitions/ordering"
+      },
+      "type": "array"
+    },
+    "relativeDateExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "days": {
+          "type": "integer"
+        },
+        "months": {
+          "type": "integer"
+        },
+        "years": {
+          "type": "integer"
+        },
+        "future": {
+          "type": "boolean"
+        },
+        "type": {
+          "const": "relativeDate"
+        }
+      },
+      "required": [
+        "days",
+        "months",
+        "years",
+        "future",
+        "type"
+      ],
+      "type": "object"
+    },
+    "relativeDateTimeExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "seconds": {
+          "type": "integer"
+        },
+        "minutes": {
+          "type": "integer"
+        },
+        "hours": {
+          "type": "integer"
+        },
+        "days": {
+          "type": "integer"
+        },
+        "months": {
+          "type": "integer"
+        },
+        "years": {
+          "type": "integer"
+        },
+        "future": {
+          "type": "boolean"
+        },
+        "type": {
+          "const": "relativeDateTime"
+        }
+      },
+      "required": [
+        "seconds",
+        "minutes",
+        "hours",
+        "days",
+        "months",
+        "years",
+        "future",
+        "type"
+      ],
+      "type": "object"
+    },
+    "stringAnyExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "expr": {
+          "$ref": "#/definitions/stringExpression"
+        },
+        "type": {
+          "const": "string"
+        }
+      },
+      "required": [
+        "expr",
+        "type"
+      ],
+      "type": "object"
+    },
+    "stringExpression": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/attributeExpression"
+        },
+        {
+          "$ref": "#/definitions/idStringExpression"
+        },
+        {
+          "$ref": "#/definitions/linkAttributeExpression"
+        },
+        {
+          "$ref": "#/definitions/literalStringExpression"
+        },
+        {
+          "$ref": "#/definitions/nameStringExpression"
+        }
+      ]
+    },
+    "timeAnyExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "expr": {
+          "$ref": "#/definitions/timeExpression"
+        },
+        "type": {
+          "const": "time"
+        }
+      },
+      "required": [
+        "expr",
+        "type"
+      ],
+      "type": "object"
+    },
+    "timeCmpBooleanExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "lhs": {
+          "$ref": "#/definitions/timeExpression"
+        },
+        "operator": {
+          "$ref": "#/definitions/cmpOperator"
+        },
+        "rhs": {
+          "$ref": "#/definitions/timeExpression"
+        },
+        "type": {
+          "const": "timeCmp"
+        }
+      },
+      "required": [
+        "lhs",
+        "operator",
+        "rhs",
+        "type"
+      ],
+      "type": "object"
+    },
+    "timeExpression": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/attributeExpression"
+        },
+        {
+          "$ref": "#/definitions/linkAttributeExpression"
+        },
+        {
+          "$ref": "#/definitions/literalTimeExpression"
+        }
+      ]
+    }
+  },
+  "properties": {
+    "alias": {
+      "type": "string"
+    },
+    "condition": {
+      "$ref": "#/definitions/booleanExpression"
+    },
+    "directLinkGroupByQueries": {
+      "$ref": "#/definitions/directLinkGroupByQueries"
+    },
+    "directLinkQueries": {
+      "$ref": "#/definitions/directLinkQueries"
+    },
+    "entityType": {
+      "type": "string"
+    },
+    "include": {
+      "$ref": "#/definitions/inclusions"
+    },
+    "limit": {
+      "type": "integer"
+    },
+    "linkGroupByQueries": {
+      "$ref": "#/definitions/linkGroupByQueries"
+    },
+    "linkQueries": {
+      "$ref": "#/definitions/linkQueries"
+    },
+    "offset": {
+      "type": "integer"
+    },
+    "orderBy": {
+      "$ref": "#/definitions/orderings"
+    },
+    "sourceId": {
+      "type": "integer"
+    }
+  },
+  "required": [
+    "alias",
+    "condition",
+    "directLinkGroupByQueries",
+    "directLinkQueries",
+    "entityType",
+    "include",
+    "limit",
+    "linkGroupByQueries",
+    "linkQueries",
+    "offset",
+    "orderBy",
+    "sourceId"
+  ],
+  "type": "object"
+}
