@@ -19,7 +19,7 @@ simplejson = "^3.17.6"
 typing-extensions = "^4.3.0"
 
 [tool.poetry.dev-dependencies]
-black = "^22.6.0"
+black = "^22.8.0"
 pydocstyle = "^6.1.1"
 
 [tool.poetry.group.dev.dependencies]
