@@ -1,7 +1,7 @@
 """API endpoints for agent interactions with an Elimity Insights server."""
 
 from dataclasses import dataclass
-from typing import List, TypeVar, cast, Type
+from typing import List, TypeVar, cast, Type, Optional
 
 from requests import request
 
@@ -33,9 +33,9 @@ _T = TypeVar("_T")
 def query(config: Config, queries: List[Query]) -> List[QueryResultsPage]:
     """Perform the given queries and return the result pages."""
     query_iter = map(encode_query, queries)
-    queries = encoder.encode(query_iter)
+    data = encoder.encode(query_iter)
     page_dicts = _request(
-        config, queries, "POST", "/api/agent/query", List[QueryResultsPageDict]
+        config, data, "POST", "/api/agent/query", List[QueryResultsPageDict]
     )
     return map_list(decode_query_results_page, page_dicts)
 
@@ -47,10 +47,18 @@ def sources(config: Config) -> List[Source]:
 
 
 def _request(
-    config: Config, json: object, method: str, path: str, _type: Type[_T]
+    config: Config, data: Optional[str], method: str, path: str, _type: Type[_T]
 ) -> _T:
     auth = config.token_id, config.token_secret
-    response = request(method, config.url + path, auth=auth, json=json)
+    headers = {"Content-Type": "application/json"}
+    response = request(
+        method,
+        config.url + path,
+        auth=auth,
+        data=data,
+        headers=headers,
+        verify=config.verify_ssl,
+    )
     response.raise_for_status()
     json = response.json()
     return cast(_T, json)
