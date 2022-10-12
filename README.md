@@ -5,19 +5,40 @@ Insights server.
 
 ## Usage
 
+### Custom source interactions
+
+The following snippet shows how to authenticate as a custom source and create a connector log at an Elimity Insights
+server. You can generate a source identifier and token by visiting the custom source's detail page in Elimity Insights
+and clicking the 'GENERATE CREDENTIALS' button, which can be found under the 'SETTINGS' tab.
+
 ```python3
 from datetime import datetime
 
 from elimity_insights_client import Client, Config, ConnectorLog, Level
 
 if __name__ == "__main__":
-    config = Config(url="https://local.elimity.com:8081", token="token")
+    config = Config(id=1, url="https://local.elimity.com:8081", token="token")
     client = Client(config)
 
     timestamp = datetime.now()
     log = ConnectorLog(level=Level.INFO, message="Hello world!", timestamp=timestamp)
     logs = [log]
     client.create_connector_logs(logs)
+```
+
+### Agent interactions
+
+This module also provides a client for agent interactions with Elimity Insights. The snippet below shows how to
+authenticate as an agent and list sources at an Elimity Insights server. You can generate a token identifier and
+secret by visiting the 'API tokens' page in Elimity Insights and clicking the 'CREATE API TOKEN' button.
+
+```python3
+from elimity_insights_client.agent.api import Config, sources
+
+if __name__ == "__main__":
+    config = Config(token_id="1", token_secret="my-secret-value", url="https://example.elimity.com", verify_ssl=True)
+    my_sources = sources(config)
+    print(my_sources)
 ```
 
 ## Installation
