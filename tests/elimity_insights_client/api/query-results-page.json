@@ -11,6 +11,10 @@
         {
           "type": "boolean",
           "value": "false"
+        },
+        {
+          "type": "dateTime",
+          "value": "2006-05-04T03:02:01Z"
         }
       ],
       "linkGroupByPages": [

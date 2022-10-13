@@ -1,6 +1,8 @@
+from datetime import date, time
 from json import loads
 from typing import List
 
+from dateutil.parser import isoparse
 from typing_extensions import TypedDict
 
 from elimity_insights_client._util import map_list
@@ -18,7 +20,6 @@ from elimity_insights_client.api.query_results_page import (
     GroupByQueryResultsPage,
     GroupByQueryResult,
 )
-from datetime import date, datetime, time
 
 
 class EntityDict(TypedDict):
@@ -108,7 +109,7 @@ def _decode_value(dict: ValueDict) -> Value:
         return DateValue(date_value)
 
     if type == "dateTime":
-        date_time_value = datetime.fromisoformat(value)
+        date_time_value = isoparse(value)
         return DateTimeValue(date_time_value)
 
     if type == "number":
