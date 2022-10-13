@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Union, List
 
-from elimity_insights_client.agent.expression import (
+from elimity_insights_client.api.expression import (
     BooleanExpression,
     DateExpression,
     DateTimeExpression,

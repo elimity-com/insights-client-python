@@ -4,7 +4,7 @@ from typing import List
 from typing_extensions import TypedDict
 
 from elimity_insights_client._util import map_list
-from elimity_insights_client.agent.query_results_page import (
+from elimity_insights_client.api.query_results_page import (
     QueryResultsPage,
     QueryResult,
     Entity,

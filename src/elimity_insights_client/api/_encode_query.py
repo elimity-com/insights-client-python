@@ -1,4 +1,4 @@
-from elimity_insights_client.agent._encode_expression import (
+from elimity_insights_client.api._encode_expression import (
     encode_boolean_expression,
     encode_date_expression,
     encode_date_time_expression,
@@ -6,7 +6,7 @@ from elimity_insights_client.agent._encode_expression import (
     encode_string_expression,
     encode_time_expression,
 )
-from elimity_insights_client.agent.query import (
+from elimity_insights_client.api.query import (
     DirectLinkQuery,
     Ordering,
     LinkGroupByQuery,

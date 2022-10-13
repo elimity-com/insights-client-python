@@ -2,7 +2,7 @@ from datetime import time
 from typing import List, TypeVar, Callable
 
 from elimity_insights_client._util import encode_datetime, local_timezone
-from elimity_insights_client.agent.expression import (
+from elimity_insights_client.api.expression import (
     BooleanExpression,
     ActiveBooleanExpression,
     AllBooleanExpression,
