@@ -6,7 +6,7 @@ from elimity_insights_client._decode_domain_graph_schema import (
     DomainGraphSchemaDict,
     decode_domain_graph_schema,
 )
-from elimity_insights_client.agent.source import (
+from elimity_insights_client.api.source import (
     Source,
     LastReloadTimestamp,
     AbsentLastReloadTimestamp,

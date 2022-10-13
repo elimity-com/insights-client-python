@@ -12,8 +12,8 @@ from elimity_insights_client._domain_graph_schema import (
     Type,
     RelationshipAttributeType,
 )
-from elimity_insights_client.agent._decode_source import decode_source
-from elimity_insights_client.agent.source import Source, PresentLastReloadTimestamp
+from elimity_insights_client.api._decode_source import decode_source
+from elimity_insights_client.api.source import Source, PresentLastReloadTimestamp
 
 
 def test_decode_source() -> None:

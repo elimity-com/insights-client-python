@@ -5,8 +5,8 @@ from hypothesis import given, settings, HealthCheck
 from simplejson import dumps
 from jsonschema import validate
 
-from elimity_insights_client.agent._encode_query import encode_query
-from elimity_insights_client.agent.query import Query
+from elimity_insights_client.api._encode_query import encode_query
+from elimity_insights_client.api.query import Query
 
 _health_checks = [HealthCheck.too_slow]
 

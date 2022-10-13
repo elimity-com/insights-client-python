@@ -2,10 +2,10 @@ from importlib.resources import open_binary
 from json import load
 from typing import List
 
-from elimity_insights_client.agent._decode_query_results_page import (
+from elimity_insights_client.api._decode_query_results_page import (
     decode_query_results_page,
 )
-from elimity_insights_client.agent.query_results_page import (
+from elimity_insights_client.api.query_results_page import (
     Entity,
     BooleanValue,
     NumberValue,

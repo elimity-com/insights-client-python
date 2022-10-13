@@ -1,4 +1,4 @@
-"""API endpoints for agent interactions with an Elimity Insights server."""
+"""Endpoints for API interactions with an Elimity Insights server."""
 
 from dataclasses import dataclass
 from typing import List, TypeVar, cast, Type, Optional
@@ -6,20 +6,20 @@ from typing import List, TypeVar, cast, Type, Optional
 from requests import request
 
 from elimity_insights_client._util import encoder, map_list
-from elimity_insights_client.agent._decode_query_results_page import (
+from elimity_insights_client.api._decode_query_results_page import (
     decode_query_results_page,
     QueryResultsPageDict,
 )
-from elimity_insights_client.agent._decode_source import SourceDict, decode_source
-from elimity_insights_client.agent.query import Query
-from elimity_insights_client.agent.query_results_page import QueryResultsPage
-from elimity_insights_client.agent._encode_query import encode_query
-from elimity_insights_client.agent.source import Source
+from elimity_insights_client.api._decode_source import SourceDict, decode_source
+from elimity_insights_client.api.query import Query
+from elimity_insights_client.api.query_results_page import QueryResultsPage
+from elimity_insights_client.api._encode_query import encode_query
+from elimity_insights_client.api.source import Source
 
 
 @dataclass
 class Config:
-    """Configuration consisting of agent credentials and connection properties."""
+    """Configuration consisting of API credentials and connection properties."""
 
     token_id: str
     token_secret: str
