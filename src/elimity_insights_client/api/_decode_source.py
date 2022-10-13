@@ -1,5 +1,6 @@
 from typing import TypedDict, Optional
 
+from dateutil.parser import isoparse
 from typing_extensions import NotRequired
 
 from elimity_insights_client._decode_domain_graph_schema import (
@@ -12,7 +13,6 @@ from elimity_insights_client.api.source import (
     AbsentLastReloadTimestamp,
     PresentLastReloadTimestamp,
 )
-from datetime import datetime
 
 
 class SourceDict(TypedDict):
@@ -40,5 +40,5 @@ def decode_source(dict: SourceDict) -> Source:
 def _decode_last_reload_timestamp(value: Optional[str]) -> LastReloadTimestamp:
     if value is None:
         return AbsentLastReloadTimestamp()
-    val = datetime.fromisoformat(value)
+    val = isoparse(value)
     return PresentLastReloadTimestamp(val)
