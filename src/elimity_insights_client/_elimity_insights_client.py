@@ -2,17 +2,15 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum, auto
 from itertools import chain
-from typing import Optional, Union, Iterable, Tuple, Dict
+from typing import Dict, Iterable, Optional, Tuple, Union
 from zlib import compressobj
 
-from requests import request, Response
+from requests import Response, request
 
 from elimity_insights_client._decode_domain_graph_schema import (
     decode_domain_graph_schema,
 )
-from elimity_insights_client._domain_graph_schema import (
-    DomainGraphSchema,
-)
+from elimity_insights_client._domain_graph_schema import DomainGraphSchema
 from elimity_insights_client._util import encode_datetime, encoder
 
 

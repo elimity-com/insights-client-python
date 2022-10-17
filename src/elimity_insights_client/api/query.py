@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from enum import Enum, auto
-from typing import Union, List
+from typing import List, Union
 
 from elimity_insights_client.api.expression import (
     BooleanExpression,

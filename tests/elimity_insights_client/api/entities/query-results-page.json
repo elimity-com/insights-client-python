@@ -1,0 +1,52 @@
+{
+  "count": 1,
+  "results": [
+    {
+      "entity": {
+        "active": true,
+        "id": "foo",
+        "name": "bar"
+      },
+      "inclusions": [],
+      "linkGroupByPages": [],
+      "linkPages": [
+        {
+          "count": 1,
+          "results": [
+            {
+              "entity": {
+                "active": false,
+                "id": "baz",
+                "name": "lorem"
+              },
+              "inclusions": [
+                {
+                  "type": "boolean",
+                  "value": "false"
+                },
+                {
+                  "type": "dateTime",
+                  "value": "0001-01-01T00:00:00Z"
+                },
+                {
+                  "type": "boolean",
+                  "value": "true"
+                },
+                {
+                  "type": "number",
+                  "value": "24"
+                }
+              ],
+              "linkGroupByPages": [],
+              "linkPages": []
+            }
+          ]
+        },
+        {
+          "count": 0,
+          "results": []
+        }
+      ]
+    }
+  ]
+}

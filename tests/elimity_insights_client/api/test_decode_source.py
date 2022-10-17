@@ -1,5 +1,3 @@
-from importlib.resources import open_binary
-from json import load
 from datetime import datetime
 from typing import List
 
@@ -7,13 +5,16 @@ from dateutil.tz import tzoffset
 
 from elimity_insights_client._domain_graph_schema import (
     AttributeType,
-    EntityType,
     DomainGraphSchema,
-    Type,
+    EntityType,
     RelationshipAttributeType,
+    Type,
 )
-from elimity_insights_client.api._decode_source import decode_source
-from elimity_insights_client.api.source import Source, PresentLastReloadTimestamp
+from elimity_insights_client.api._decode_source import SourceDict, decode_source
+from elimity_insights_client.api.source import PresentLastReloadTimestamp, Source
+from tests.elimity_insights_client.api._json import (
+    decode_file_local as json_decode_file_local,
+)
 
 
 def test_decode_source() -> None:
@@ -28,6 +29,5 @@ def test_decode_source() -> None:
     tzinfo = tzoffset(None, 25200)
     dat = datetime(2006, 5, 4, 3, 2, 1, tzinfo=tzinfo)
     timestamp = PresentLastReloadTimestamp(dat)
-    source_file = open_binary(__package__, "source.json")
-    source_json = load(source_file)
-    assert Source(True, schema, 42, timestamp, "foo") == decode_source(source_json)
+    json = json_decode_file_local("source.json", SourceDict)
+    assert Source(True, schema, 42, timestamp, "foo") == decode_source(json)

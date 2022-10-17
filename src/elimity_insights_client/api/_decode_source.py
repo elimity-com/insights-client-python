@@ -1,4 +1,4 @@
-from typing import TypedDict, Optional
+from typing import Optional, TypedDict
 
 from dateutil.parser import isoparse
 from typing_extensions import NotRequired
@@ -8,10 +8,10 @@ from elimity_insights_client._decode_domain_graph_schema import (
     decode_domain_graph_schema,
 )
 from elimity_insights_client.api.source import (
-    Source,
-    LastReloadTimestamp,
     AbsentLastReloadTimestamp,
+    LastReloadTimestamp,
     PresentLastReloadTimestamp,
+    Source,
 )
 
 

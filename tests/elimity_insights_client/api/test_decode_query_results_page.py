@@ -7,15 +7,15 @@ from elimity_insights_client.api._decode_query_results_page import (
     decode_query_results_page,
 )
 from elimity_insights_client.api.query_results_page import (
-    Entity,
     BooleanValue,
-    NumberValue,
-    GroupByQueryResultsPage,
+    DateTimeValue,
+    Entity,
     GroupByQueryResult,
+    GroupByQueryResultsPage,
+    NumberValue,
     QueryResult,
     QueryResultsPage,
     Value,
-    DateTimeValue,
 )
 
 

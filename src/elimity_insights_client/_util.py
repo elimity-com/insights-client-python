@@ -1,9 +1,9 @@
 from datetime import datetime
-from simplejson import JSONEncoder
-from typing import TypeVar, Callable, List
+from typing import Callable, List, TypeVar
 
 from dateutil.tz import tzlocal
 from dateutil.utils import default_tzinfo
+from simplejson import JSONEncoder
 
 encoder = JSONEncoder(iterable_as_array=True)
 local_timezone = tzlocal()

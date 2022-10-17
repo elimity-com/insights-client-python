@@ -1,12 +1,12 @@
 from typing import List
 
-from typing_extensions import TypedDict, NotRequired
+from typing_extensions import NotRequired, TypedDict
 
 from elimity_insights_client._domain_graph_schema import (
-    DomainGraphSchema,
     AttributeType,
-    RelationshipAttributeType,
+    DomainGraphSchema,
     EntityType,
+    RelationshipAttributeType,
     Type,
 )
 from elimity_insights_client._util import map_list

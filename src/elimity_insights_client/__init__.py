@@ -5,6 +5,13 @@ Note that this module interprets timestamps without timezone information as
 being defined in the local system timezone.
 """
 
+from elimity_insights_client._domain_graph_schema import (
+    AttributeType,
+    DomainGraphSchema,
+    EntityType,
+    RelationshipAttributeType,
+    Type,
+)
 from elimity_insights_client._elimity_insights_client import (
     AttributeAssignment,
     BooleanValue,
@@ -23,13 +30,6 @@ from elimity_insights_client._elimity_insights_client import (
     StringValue,
     TimeValue,
     Value,
-)
-from elimity_insights_client._domain_graph_schema import (
-    AttributeType,
-    DomainGraphSchema,
-    EntityType,
-    RelationshipAttributeType,
-    Type,
 )
 
 __all__ = [
