@@ -4,31 +4,32 @@ from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from json import loads
 from threading import Thread
-from typing import List, Type as TypingType, Iterator
+from typing import Iterator, List
+from typing import Type as TypingType
 from unittest import TestCase
 from zlib import decompress
 
 from elimity_insights_client import (
+    AttributeAssignment,
+    AttributeType,
+    BooleanValue,
     Client,
     Config,
-    Relationship,
-    Entity,
-    DomainGraph,
-    AttributeAssignment,
-    BooleanValue,
-    DateValue,
+    ConnectorLog,
+    DateTime,
     DateTimeValue,
+    DateValue,
+    DomainGraph,
+    DomainGraphSchema,
+    Entity,
+    EntityType,
+    Level,
     NumberValue,
+    Relationship,
+    RelationshipAttributeType,
     StringValue,
     TimeValue,
-    ConnectorLog,
-    Level,
-    DomainGraphSchema,
-    AttributeType,
     Type,
-    EntityType,
-    RelationshipAttributeType,
-    DateTime,
 )
 
 

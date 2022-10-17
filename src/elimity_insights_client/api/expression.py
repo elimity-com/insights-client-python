@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from datetime import date, datetime, time
 from enum import Enum, auto
-from typing import Union, List
+from typing import List, Union
 
 
 @dataclass

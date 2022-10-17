@@ -7,18 +7,18 @@ from typing_extensions import TypedDict
 
 from elimity_insights_client._util import map_list
 from elimity_insights_client.api.query_results_page import (
-    QueryResultsPage,
-    QueryResult,
-    Entity,
-    Value,
     BooleanValue,
-    DateValue,
     DateTimeValue,
+    DateValue,
+    Entity,
+    GroupByQueryResult,
+    GroupByQueryResultsPage,
     NumberValue,
+    QueryResult,
+    QueryResultsPage,
     StringValue,
     TimeValue,
-    GroupByQueryResultsPage,
-    GroupByQueryResult,
+    Value,
 )
 
 

@@ -1,0 +1,85 @@
+{
+  "alias": "",
+  "condition": {
+    "boolean": true,
+    "type": "literal"
+  },
+  "directLinkGroupByQueries": [],
+  "directLinkQueries": [],
+  "entityType": "foo",
+  "include": [],
+  "limit": 999999,
+  "linkGroupByQueries": [],
+  "linkQueries": [
+    {
+      "alias": "",
+      "condition": {
+        "boolean": true,
+        "type": "literal"
+      },
+      "directLinkGroupByQueries": [],
+      "directLinkQueries": [],
+      "entityType": "bar",
+      "include": [
+        {
+          "expr": {
+            "attributeType": "baz",
+            "reference": "",
+            "type": "assigned"
+          },
+          "type": "boolean"
+        },
+        {
+          "expr": {
+            "attributeType": "baz",
+            "reference": "",
+            "type": "attribute"
+          },
+          "type": "dateTime"
+        },
+        {
+          "expr": {
+            "attributeType": "ipsum",
+            "reference": "",
+            "type": "assigned"
+          },
+          "type": "boolean"
+        },
+        {
+          "expr": {
+            "attributeType": "ipsum",
+            "reference": "",
+            "type": "attribute"
+          },
+          "type": "number"
+        }
+      ],
+      "limit": 999999,
+      "linkGroupByQueries": [],
+      "linkQueries": [],
+      "offset": 0,
+      "orderBy": [],
+      "sourceId": 42
+    },
+    {
+      "alias": "",
+      "condition": {
+        "boolean": true,
+        "type": "literal"
+      },
+      "directLinkGroupByQueries": [],
+      "directLinkQueries": [],
+      "entityType": "lorem",
+      "include": [],
+      "limit": 999999,
+      "linkGroupByQueries": [],
+      "linkQueries": [],
+      "offset": 0,
+      "orderBy": [],
+      "sourceId": 42
+    }
+  ],
+  "offset": 0,
+  "orderBy": [],
+  "sourceId": 42
+}
