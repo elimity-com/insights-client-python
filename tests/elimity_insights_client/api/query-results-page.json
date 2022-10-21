@@ -15,6 +15,10 @@
         {
           "type": "dateTime",
           "value": "2006-05-04T03:02:01Z"
+        },
+        {
+          "type": "time",
+          "value": "10:11:12Z"
         }
       ],
       "linkGroupByPages": [

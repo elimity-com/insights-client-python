@@ -1,8 +1,8 @@
-from datetime import date, time
+from datetime import date
 from json import loads
 from typing import List
 
-from dateutil.parser import isoparse
+from dateutil.parser import isoparse, isoparser
 from typing_extensions import TypedDict
 
 from elimity_insights_client._util import map_list
@@ -119,5 +119,6 @@ def _decode_value(dict: ValueDict) -> Value:
     if type == "string":
         return StringValue(value)
 
-    time_value = time.fromisoformat(value)
+    parser = isoparser()
+    time_value = parser.parse_isotime(value)
     return TimeValue(time_value)
