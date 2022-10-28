@@ -1,0 +1,82 @@
+[
+  {
+    "schema": {
+      "entityAttributeTypes": [
+        {
+          "archived": false,
+          "description": "foo",
+          "entityTypeId": "bar",
+          "id": "baz",
+          "name": "lorem",
+          "type": "dateTime"
+        },
+        {
+          "archived": true,
+          "description": "lorem",
+          "entityTypeId": "foo",
+          "id": "bar",
+          "name": "baz",
+          "type": "string"
+        },
+        {
+          "archived": false,
+          "description": "foo",
+          "entityTypeId": "bar",
+          "id": "ipsum",
+          "name": "lorem",
+          "type": "number"
+        }
+      ],
+      "entityTypes": [
+        {
+          "anonymized": false,
+          "icon": "foo",
+          "id": "bar",
+          "plural": "baz",
+          "singular": "lorem"
+        },
+        {
+          "anonymized": false,
+          "icon": "lorem",
+          "id": "foo",
+          "plural": "bar",
+          "singular": "baz"
+        },
+        {
+          "anonymized": true,
+          "icon": "baz",
+          "id": "lorem",
+          "plural": "foo",
+          "singular": "bar"
+        }
+      ],
+      "relationshipAttributeTypes": []
+    },
+    "sourceId": 42
+  },
+  {
+    "schema": {
+      "entityAttributeTypes": [
+        {
+          "archived": false,
+          "description": "foo",
+          "entityTypeId": "bar",
+          "id": "ipsum",
+          "name": "lorem",
+          "type": "number"
+        }
+      ],
+      "entityTypes": [
+        {
+          "anonymized": false,
+          "icon": "foo",
+          "id": "bar",
+          "plural": "baz",
+          "singular": "lorem"
+        }
+      ],
+      "relationshipAttributeTypes": []
+    },
+    "sourceId": 24
+  }
+]

@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List
 
 from more_itertools import interleave
 
@@ -8,6 +8,7 @@ from elimity_insights_client._domain_graph_schema import (
     Type,
 )
 from elimity_insights_client._util import map_list
+from elimity_insights_client.api.entities._entity import EntityType
 from elimity_insights_client.api.entities._schema import (
     attribute_types as schema_attribute_types,
 )
@@ -47,17 +48,16 @@ from elimity_insights_client.api.query import (
 
 
 def query(
-    entity_type: str,
-    schema: DomainGraphSchema,
-    source_id: int,
+    entity_type: EntityType,
+    schemas: Dict[int, DomainGraphSchema],
 ) -> Query:
-    def make_link_query(entity_type: str) -> Query:
+    def make_link_query(entity_type: EntityType) -> Query:
         link_queries: List[Query] = []
-        return _query(entity_type, link_queries, schema, source_id)
+        return _query(entity_type, link_queries, schemas)
 
-    link_entity_types = schema_link_entity_types(entity_type, schema)
+    link_entity_types = schema_link_entity_types(entity_type, schemas)
     link_queries = map_list(make_link_query, link_entity_types)
-    return _query(entity_type, link_queries, schema, source_id)
+    return _query(entity_type, link_queries, schemas)
 
 
 def _assigned_inclusion(type: AttributeType) -> AnyExpression:
@@ -87,8 +87,10 @@ def _attribute_inclusion(type: AttributeType) -> AnyExpression:
     return TimeAnyExpression(time_expr)
 
 
-def _inclusions(entity_type: str, schema: DomainGraphSchema) -> List[AnyExpression]:
-    attribute_types = schema_attribute_types(entity_type, schema)
+def _inclusions(
+    entity_type: EntityType, schemas: Dict[int, DomainGraphSchema]
+) -> List[AnyExpression]:
+    attribute_types = schema_attribute_types(entity_type, schemas)
     assigned_iter = map(_assigned_inclusion, attribute_types)
     attribute_iter = map(_attribute_inclusion, attribute_types)
     inclusion_iter = interleave(assigned_iter, attribute_iter)
@@ -96,15 +98,14 @@ def _inclusions(entity_type: str, schema: DomainGraphSchema) -> List[AnyExpressi
 
 
 def _query(
-    entity_type: str,
+    entity_type: EntityType,
     link_queries: List[Query],
-    schema: DomainGraphSchema,
-    source_id: int,
+    schemas: Dict[int, DomainGraphSchema],
 ) -> Query:
     condition = LiteralBooleanExpression(True)
     direct_link_group_by_queries: List[DirectLinkGroupByQuery] = []
     direct_link_queries: List[DirectLinkQuery] = []
-    inclusions = _inclusions(entity_type, schema)
+    inclusions = _inclusions(entity_type, schemas)
     link_group_by_queries: List[LinkGroupByQuery] = []
     orderings: List[Ordering] = []
     return Query(
@@ -112,12 +113,12 @@ def _query(
         condition,
         direct_link_group_by_queries,
         direct_link_queries,
-        entity_type,
+        entity_type.id,
         inclusions,
         999999,
         link_group_by_queries,
         link_queries,
         0,
         orderings,
-        source_id,
+        entity_type.source_id,
     )

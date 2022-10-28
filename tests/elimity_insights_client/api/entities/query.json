@@ -77,6 +77,40 @@
       "offset": 0,
       "orderBy": [],
       "sourceId": 42
+    },
+    {
+      "alias": "",
+      "condition": {
+        "boolean": true,
+        "type": "literal"
+      },
+      "directLinkGroupByQueries": [],
+      "directLinkQueries": [],
+      "entityType": "bar",
+      "include": [
+        {
+          "expr": {
+            "attributeType": "ipsum",
+            "reference": "",
+            "type": "assigned"
+          },
+          "type": "boolean"
+        },
+        {
+          "expr": {
+            "attributeType": "ipsum",
+            "reference": "",
+            "type": "attribute"
+          },
+          "type": "number"
+        }
+      ],
+      "limit": 999999,
+      "linkGroupByQueries": [],
+      "linkQueries": [],
+      "offset": 0,
+      "orderBy": [],
+      "sourceId": 24
     }
   ],
   "offset": 0,
