@@ -45,6 +45,30 @@
         {
           "count": 0,
           "results": []
+        },
+        {
+          "count": 1,
+          "results": [
+            {
+              "entity": {
+                "active": false,
+                "id": "baz",
+                "name": "lorem"
+              },
+              "inclusions": [
+                {
+                  "type": "boolean",
+                  "value": "true"
+                },
+                {
+                  "type": "number",
+                  "value": "24"
+                }
+              ],
+              "linkGroupByPages": [],
+              "linkPages": []
+            }
+          ]
         }
       ]
     }

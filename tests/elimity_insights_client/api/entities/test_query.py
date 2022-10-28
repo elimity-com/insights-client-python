@@ -4,10 +4,11 @@ from tests.elimity_insights_client.api._json import (
 )
 from tests.elimity_insights_client.api.entities._entities import (
     json_decode_file_local,
-    schema,
+    schemas,
+    type,
 )
 
 
 def test_query() -> None:
-    que = query("foo", schema, 42)
+    que = query(type, schemas)
     assert json_decode_file_local("query.json", object) == json_encode_query_list(que)

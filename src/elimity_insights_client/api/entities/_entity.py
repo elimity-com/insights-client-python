@@ -10,8 +10,16 @@ class Entity:
 
     attribute_assignments: Dict[str, Value]
     id: str
-    links: Dict[str, List["Link"]]
+    links: Dict["EntityType", List["Link"]]
     name: str
+
+
+@dataclass(frozen=True)
+class EntityType:
+    """Type of entities for a given source, represents a unique key in dictionaries of links."""
+
+    id: str
+    source_id: int
 
 
 @dataclass

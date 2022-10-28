@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import Dict, List
 
 from more_itertools import chunked
 
@@ -8,7 +8,7 @@ from elimity_insights_client._domain_graph_schema import (
     DomainGraphSchema,
 )
 from elimity_insights_client._util import map_list
-from elimity_insights_client.api.entities._entity import Entity, Link
+from elimity_insights_client.api.entities._entity import Entity, EntityType, Link
 from elimity_insights_client.api.entities._schema import (
     attribute_types as schema_attribute_types,
 )
@@ -32,24 +32,26 @@ class _AttributeAssignment:
 
 @dataclass
 class _LinkGroup:
-    entity_type: str
+    entity_type: EntityType
     links: List[Link]
 
 
 def parse_query_results_page(
-    entity_type: str, page: QueryResultsPage, schema: DomainGraphSchema
+    entity_type: EntityType,
+    page: QueryResultsPage,
+    schemas: Dict[int, DomainGraphSchema],
 ) -> List[Entity]:
     def make_entity(result: QueryResult) -> Entity:
-        entity = _link(entity_type, schema, result)
+        entity = _link(entity_type, result, schemas)
 
-        def make_group(entity_type: str, page: QueryResultsPage) -> _LinkGroup:
+        def make_group(entity_type: EntityType, page: QueryResultsPage) -> _LinkGroup:
             def make_link(result: QueryResult) -> Link:
-                return _link(entity_type, schema, result)
+                return _link(entity_type, result, schemas)
 
             links = map_list(make_link, page.results)
             return _LinkGroup(entity_type, links)
 
-        link_entity_types = schema_link_entity_types(entity_type, schema)
+        link_entity_types = schema_link_entity_types(entity_type, schemas)
         group_iter = map(make_group, link_entity_types, result.link_pages)
         links = {group.entity_type: group.links for group in group_iter}
         return Entity(entity.attribute_assignments, entity.id, links, entity.name)
@@ -65,9 +67,11 @@ def _attribute_assignment(
     return _AttributeAssignment(assigned, type.id, value_inclusion)
 
 
-def _link(entity_type: str, schema: DomainGraphSchema, result: QueryResult) -> Link:
+def _link(
+    entity_type: EntityType, result: QueryResult, schemas: Dict[int, DomainGraphSchema]
+) -> Link:
     inclusions_iter = chunked(result.inclusions, 2)
-    attribute_types = schema_attribute_types(entity_type, schema)
+    attribute_types = schema_attribute_types(entity_type, schemas)
     assignment_iter = map(_attribute_assignment, inclusions_iter, attribute_types)
     assignments = {
         assignment.attribute_type: assignment.value
