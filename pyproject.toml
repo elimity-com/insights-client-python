@@ -9,7 +9,7 @@ license = "Apache-2.0"
 name = "elimity-insights-client"
 readme = "README.md"
 repository = "https://github.com/elimity-com/insights-client-python"
-version = "10.0.0b0"
+version = "10.0.0b1"
 
 [tool.poetry.dependencies]
 python = "^3.7"
