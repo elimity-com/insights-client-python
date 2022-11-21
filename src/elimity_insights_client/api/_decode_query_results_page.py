@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from json import loads
 from typing import List
 
@@ -105,11 +105,11 @@ def _decode_value(dict: ValueDict) -> Value:
         return BooleanValue(value == "true")
 
     if type == "date":
-        date_value = date.fromisoformat(value)
+        date_value = _parse_date(value)
         return DateValue(date_value)
 
     if type == "dateTime":
-        date_time_value = isoparse(value)
+        date_time_value = _parse_datetime(value)
         return DateTimeValue(date_time_value)
 
     if type == "number":
@@ -122,3 +122,17 @@ def _decode_value(dict: ValueDict) -> Value:
     parser = isoparser()
     time_value = parser.parse_isotime(value)
     return TimeValue(time_value)
+
+
+def _parse_date(value: str) -> date:
+    try:
+        return date.fromisoformat(value)
+    except ValueError:
+        return date.min
+
+
+def _parse_datetime(value: str) -> datetime:
+    try:
+        return isoparse(value)
+    except ValueError:
+        return datetime.min
