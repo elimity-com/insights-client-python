@@ -1,0 +1,540 @@
+{
+  "entityAttributeTypes": [
+    {
+      "archived": false,
+      "description": "The date when the account expires.",
+      "entityTypeId": "user",
+      "id": "accountExpires",
+      "name": "Account expiry time",
+      "type": "dateTime"
+    },
+    {
+      "archived": false,
+      "description": "The type of the account (normal, trust, MSN logon, ...).",
+      "entityTypeId": "user",
+      "id": "accountType",
+      "name": "Account type",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "The number of times the user tried to log on to the account using an incorrect password. A value of 0 indicates that the value is unknown.",
+      "entityTypeId": "user",
+      "id": "badPwdCount",
+      "name": "Bad password count",
+      "type": "number"
+    },
+    {
+      "archived": false,
+      "description": "The name that represents an object. Used to perform searches.",
+      "entityTypeId": "user",
+      "id": "cn",
+      "name": "Common name",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "The user's company name.",
+      "entityTypeId": "user",
+      "id": "company",
+      "name": "Company",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "Specifies the country/region code for the user's language of choice.",
+      "entityTypeId": "user",
+      "id": "countryCode",
+      "name": "County code",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "Contains the name for the department in which the user works.",
+      "entityTypeId": "user",
+      "id": "department",
+      "name": "Department",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "Identifies a department within an organization.",
+      "entityTypeId": "user",
+      "id": "departmentNumber",
+      "name": "Department number",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "Contains the description to display for an object.",
+      "entityTypeId": "user",
+      "id": "description",
+      "name": "Description",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "Flag indicating whether the account is disabled.",
+      "entityTypeId": "user",
+      "id": "disabled",
+      "name": "Disabled",
+      "type": "boolean"
+    },
+    {
+      "archived": false,
+      "description": "Unique identifier for the object.",
+      "entityTypeId": "user",
+      "id": "distinguishedName",
+      "name": "Distinguished name",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "The display name for an object. This is usually the combination of the users first name, middle initial, and last name.",
+      "entityTypeId": "user",
+      "id": "displayName",
+      "name": "Display name",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "The user's division.",
+      "entityTypeId": "user",
+      "id": "division",
+      "name": "Division",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "The ID of an employee.",
+      "entityTypeId": "user",
+      "id": "employeeID",
+      "name": "Employee ID",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "Contains the given name (first name) of the user.",
+      "entityTypeId": "user",
+      "id": "givenName",
+      "name": "Given name",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "Contains the initials for parts of the user's full name. This may be used as the middle initial in the Windows Address Book.",
+      "entityTypeId": "user",
+      "id": "initials",
+      "name": "Initials",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "If TRUE, this object has been marked for deletion and cannot be instantiated.",
+      "entityTypeId": "user",
+      "id": "isDeleted",
+      "name": "Deleted",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "Represents the name of a locality, such as a town or city.",
+      "entityTypeId": "user",
+      "id": "l",
+      "name": "Locality",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "The last time the user logged on.",
+      "entityTypeId": "user",
+      "id": "lastLogon",
+      "name": "Last logon time",
+      "type": "dateTime"
+    },
+    {
+      "archived": false,
+      "description": "Flag indicating whether the account is locked out.",
+      "entityTypeId": "user",
+      "id": "lockedOut",
+      "name": "Locked out",
+      "type": "boolean"
+    },
+    {
+      "archived": false,
+      "description": "The number of times the account has successfully logged on. A value of 0 indicates that the value is unknown.",
+      "entityTypeId": "user",
+      "id": "logonCount",
+      "name": "Logon count",
+      "type": "number"
+    },
+    {
+      "archived": false,
+      "description": "The list of email addresses for a contact..",
+      "entityTypeId": "user",
+      "id": "mail",
+      "name": "Email addresses",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "Contains the distinguished name of the user who is the user's manager.",
+      "entityTypeId": "user",
+      "id": "manager",
+      "name": "Manager",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "The list of classes from which this class is derived.",
+      "entityTypeId": "user",
+      "id": "objectClass",
+      "name": "Object classes",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "A binary value that specifies the security identifier (SID) of the user. The SID is a unique value used to identify the user as a security principal.",
+      "entityTypeId": "user",
+      "id": "objectSid",
+      "name": "Object SID",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "Flag indicating whether the account's password has expired.",
+      "entityTypeId": "user",
+      "id": "passwordExpired",
+      "name": "Password expired",
+      "type": "boolean"
+    },
+    {
+      "archived": false,
+      "description": "Flag indicating whether a password is required for the account.",
+      "entityTypeId": "user",
+      "id": "passwdNotreqd",
+      "name": "Password not required",
+      "type": "boolean"
+    },
+    {
+      "archived": false,
+      "description": "The date and time that the password for this account was last changed.",
+      "entityTypeId": "user",
+      "id": "pwdLastSet",
+      "name": "Password last set time",
+      "type": "dateTime"
+    },
+    {
+      "archived": false,
+      "description": "The logon name used to support clients and servers running earlier versions of the operating system, such as Windows NT 4.0, Windows 95, Windows 98, and LAN Manager.",
+      "entityTypeId": "user",
+      "id": "sAMAccountName",
+      "name": "SAM account name",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "The primary telephone number.",
+      "entityTypeId": "user",
+      "id": "telephoneNumber",
+      "name": "Telephone number",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "This attribute contains the UPN that is an Internet-style login name for a user based on the Internet standard RFC 822.",
+      "entityTypeId": "user",
+      "id": "userPrincipalName",
+      "name": "User principal name",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "The date when this object was last changed.",
+      "entityTypeId": "user",
+      "id": "whenChanged",
+      "name": "Last changed time",
+      "type": "dateTime"
+    },
+    {
+      "archived": false,
+      "description": "The date when this object was created.",
+      "entityTypeId": "user",
+      "id": "whenCreated",
+      "name": "Creation time",
+      "type": "dateTime"
+    },
+    {
+      "archived": false,
+      "description": "If TRUE, this object has been marked for deletion and cannot be instantiated.",
+      "entityTypeId": "group",
+      "id": "isDeleted",
+      "name": "Deleted",
+      "type": "boolean"
+    },
+    {
+      "archived": false,
+      "description": "Contains the description to display for an object.",
+      "entityTypeId": "group",
+      "id": "description",
+      "name": "Description",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "Unique identifier for the object.",
+      "entityTypeId": "group",
+      "id": "distinguishedName",
+      "name": "Distinguished name",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "The display name for an object. This is usually the combination of the users first name, middle initial, and last name.",
+      "entityTypeId": "group",
+      "id": "displayName",
+      "name": "Display name",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "The last time the user logged on.",
+      "entityTypeId": "group",
+      "id": "lastLogon",
+      "name": "Last logon time",
+      "type": "dateTime"
+    },
+    {
+      "archived": false,
+      "description": "The number of times the account has successfully logged on. A value of 0 indicates that the value is unknown.",
+      "entityTypeId": "group",
+      "id": "logonCount",
+      "name": "Logon count",
+      "type": "number"
+    },
+    {
+      "archived": false,
+      "description": "The distinguished name of the user that is assigned to manage this object.",
+      "entityTypeId": "group",
+      "id": "managedBy",
+      "name": "Managed by",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "The list of classes from which this class is derived.",
+      "entityTypeId": "group",
+      "id": "objectClass",
+      "name": "Object classes",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "A binary value that specifies the security identifier (SID) of the user. The SID is a unique value used to identify the user as a security principal.",
+      "entityTypeId": "group",
+      "id": "objectSid",
+      "name": "Object SID",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "The logon name used to support clients and servers running earlier versions of the operating system, such as Windows NT 4.0, Windows 95, Windows 98, and LAN Manager.",
+      "entityTypeId": "group",
+      "id": "sAMAccountName",
+      "name": "SAM account name",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "The date when this object was last changed.",
+      "entityTypeId": "group",
+      "id": "whenChanged",
+      "name": "Last changed time",
+      "type": "dateTime"
+    },
+    {
+      "archived": false,
+      "description": "The date when this object was created.",
+      "entityTypeId": "group",
+      "id": "whenCreated",
+      "name": "Creation time",
+      "type": "dateTime"
+    },
+    {
+      "archived": false,
+      "description": "The date when the account expires.",
+      "entityTypeId": "computer",
+      "id": "accountExpires",
+      "name": "Account expiry time",
+      "type": "dateTime"
+    },
+    {
+      "archived": false,
+      "description": "The type of the account (normal, trust, MSN logon, ...).",
+      "entityTypeId": "computer",
+      "id": "accountType",
+      "name": "Account type",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "The number of times the user tried to log on to the account using an incorrect password. A value of 0 indicates that the value is unknown.",
+      "entityTypeId": "computer",
+      "id": "badPwdCount",
+      "name": "Bad password count",
+      "type": "number"
+    },
+    {
+      "archived": false,
+      "description": "The name that represents an object. Used to perform searches.",
+      "entityTypeId": "computer",
+      "id": "cn",
+      "name": "Common name",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "Contains the description to display for an object.",
+      "entityTypeId": "computer",
+      "id": "description",
+      "name": "Description",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "Flag indicating whether the account is disabled.",
+      "entityTypeId": "computer",
+      "id": "disabled",
+      "name": "Disabled",
+      "type": "boolean"
+    },
+    {
+      "archived": false,
+      "description": "Unique identifier for the object.",
+      "entityTypeId": "computer",
+      "id": "distinguishedName",
+      "name": "Distinguished name",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "The display name for an object. This is usually the combination of the users first name, middle initial, and last name.",
+      "entityTypeId": "computer",
+      "id": "displayName",
+      "name": "Display name",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "If TRUE, this object has been marked for deletion and cannot be instantiated.",
+      "entityTypeId": "computer",
+      "id": "isDeleted",
+      "name": "Deleted",
+      "type": "boolean"
+    },
+    {
+      "archived": false,
+      "description": "Flag indicating whether the account is locked out.",
+      "entityTypeId": "computer",
+      "id": "lockedOut",
+      "name": "Locked out",
+      "type": "boolean"
+    },
+    {
+      "archived": false,
+      "description": "The list of classes from which this class is derived.",
+      "entityTypeId": "computer",
+      "id": "objectClass",
+      "name": "Object classes",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "A binary value that specifies the security identifier (SID) of the user. The SID is a unique value used to identify the user as a security principal.",
+      "entityTypeId": "computer",
+      "id": "objectSid",
+      "name": "Object SID",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "The Operating System name, for example, Windows Vista Enterprise.",
+      "entityTypeId": "computer",
+      "id": "operatingSystem",
+      "name": "Operating system",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "he operating system service pack ID string (for example, SP3).",
+      "entityTypeId": "computer",
+      "id": "operatingSystemPack",
+      "name": "Operating system service pack",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "The operating system version string, for example, 4.0.",
+      "entityTypeId": "computer",
+      "id": "operatingSystemVersion",
+      "name": "Operating system version",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "The date and time that the password for this account was last changed.",
+      "entityTypeId": "computer",
+      "id": "pwdLastSet",
+      "name": "Password last set time",
+      "type": "dateTime"
+    },
+    {
+      "archived": false,
+      "description": "The logon name used to support clients and servers running earlier versions of the operating system, such as Windows NT 4.0, Windows 95, Windows 98, and LAN Manager.",
+      "entityTypeId": "computer",
+      "id": "sAMAccountName",
+      "name": "SAM account name",
+      "type": "string"
+    },
+    {
+      "archived": false,
+      "description": "The date when this object was last changed.",
+      "entityTypeId": "computer",
+      "id": "whenChanged",
+      "name": "Last changed time",
+      "type": "dateTime"
+    },
+    {
+      "archived": false,
+      "description": "The date when this object was created.",
+      "entityTypeId": "computer",
+      "id": "whenCreated",
+      "name": "Creation time",
+      "type": "dateTime"
+    }
+  ],
+  "entityTypes": [
+    {
+      "anonymized": false,
+      "icon": "person",
+      "id": "user",
+      "plural": "Users",
+      "singular": "User"
+    },
+    {
+      "anonymized": false,
+      "icon": "group",
+      "id": "group",
+      "plural": "Groups",
+      "singular": "Group"
+    },
+    {
+      "anonymized": false,
+      "icon": "computer",
+      "id": "computer",
+      "plural": "Computers",
+      "singular": "Computer"
+    }
+  ],
+  "relationshipAttributeTypes": []
+}
