@@ -764,14 +764,14 @@ files = [
 
 [[package]]
 name = "types-jsonschema"
-version = "4.16.1"
+version = "4.17.0.2"
 description = "Typing stubs for jsonschema"
 category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-jsonschema-4.16.1.tar.gz", hash = "sha256:95e31d2b90da218faf3d8fa34fa33ae55fc52c79b2cb7308755cc2d7d71b1096"},
-    {file = "types_jsonschema-4.16.1-py3-none-any.whl", hash = "sha256:21ca9a227185b83655c71755b5834c36d66ca43f9de77c018d61c4f917f851ab"},
+    {file = "types-jsonschema-4.17.0.2.tar.gz", hash = "sha256:8b9e1140d4d780f0f19b5cab1b8a3732e8dd5e49dbc1f174cc0b499125ca6f6c"},
+    {file = "types_jsonschema-4.17.0.2-py3-none-any.whl", hash = "sha256:8fd2f9aea4da54f9a811baa6963aac10fd680c18baa6237392c079b97d152738"},
 ]
 
 [[package]]
