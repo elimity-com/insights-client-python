@@ -173,7 +173,7 @@ class _AuthenticationHandler(BaseHTTPRequestHandler):
 
 class _CreateConnectorLogsHandler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:
-        if self.path != "/api/custom-sources/42/connector-logs":
+        if self.path != "/api/sources/42/connector-logs":
             self.send_error(HTTPStatus.NOT_FOUND)
             return
 
@@ -213,7 +213,7 @@ class _EncodeDatetimeHandler(BaseHTTPRequestHandler):
 
 class _GetDomainGraphSchemaHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
-        if self.path != "/api/custom-sources/42/domain-graph-schema":
+        if self.path != "/api/sources/42/domain-graph-schema":
             self.send_error(HTTPStatus.NOT_FOUND)
             return
 
@@ -264,7 +264,7 @@ class _GetDomainGraphSchemaHandler(BaseHTTPRequestHandler):
 
 class _ReloadDomainGraphHandler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:
-        if self.path != "/api/custom-sources/42/snapshots":
+        if self.path != "/api/sources/42/snapshots":
             self.send_error(HTTPStatus.NOT_FOUND)
             return
 

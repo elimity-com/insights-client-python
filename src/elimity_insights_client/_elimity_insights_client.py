@@ -85,7 +85,7 @@ class Client:
     ) -> Response:
         config = self._config
         id_ = config.id
-        url = f"{config.url}/api/custom-sources/{id_}/{path}"
+        url = f"{config.url}/api/sources/{id_}/{path}"
         auth = str(id_), config.token
         cert = _cert(config.certificate)
         response = request(
