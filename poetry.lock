@@ -241,14 +241,14 @@ files = [
 
 [[package]]
 name = "isort"
-version = "5.10.1"
+version = "5.11.4"
 description = "A Python utility / library to sort Python imports."
 category = "dev"
 optional = false
-python-versions = ">=3.6.1,<4.0"
+python-versions = ">=3.7.0"
 files = [
-    {file = "isort-5.10.1-py3-none-any.whl", hash = "sha256:6f62d78e2f89b4500b080fe3a81690850cd254227f27f75c3a0c491a1f351ba7"},
-    {file = "isort-5.10.1.tar.gz", hash = "sha256:e8443a5e7a020e9d7f97f1d7d9cd17c88bcb3bc7e218bf9cf5095fe550be2951"},
+    {file = "isort-5.11.4-py3-none-any.whl", hash = "sha256:c033fd0edb91000a7f09527fe5c75321878f98322a77ddcc81adbd83724afb7b"},
+    {file = "isort-5.11.4.tar.gz", hash = "sha256:6db30c5ded9815d813932c04c2f85a360bcdd35fed496f4d8f35495ef0a261b6"},
 ]
 
 [package.extras]
@@ -792,14 +792,14 @@ types-urllib3 = "<1.27"
 
 [[package]]
 name = "types-simplejson"
-version = "3.17.7"
+version = "3.18.0.0"
 description = "Typing stubs for simplejson"
 category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "types-simplejson-3.17.7.tar.gz", hash = "sha256:801cfa251ef54b707f16256546f84f4e29156177875838c8f33e2c1527f62b47"},
-    {file = "types_simplejson-3.17.7-py3-none-any.whl", hash = "sha256:d0efa5696274973030c39a336674a21e16cf2838a85aef3181d4d9f511b2eeef"},
+    {file = "types-simplejson-3.18.0.0.tar.gz", hash = "sha256:857adb13190abd65d0d103be965152e79a6842c5663e01e8681bde1895713f52"},
+    {file = "types_simplejson-3.18.0.0-py3-none-any.whl", hash = "sha256:f8a8428f753574fa3b7eb290756776f0fb6b4ad9cae72bf8c0c9534eeda6398c"},
 ]
 
 [[package]]
