@@ -23,7 +23,7 @@ more-itertools = ">=8.14,<10.0"
 black = "^23.1.0"
 
 [tool.poetry.group.dev.dependencies]
-mypy = ">=0.981,<1.1"
+mypy = ">=0.981,<1.2"
 types-python-dateutil = "^2.8.19"
 types-requests = "^2.28.11"
 types-simplejson = "^3.17.7"
