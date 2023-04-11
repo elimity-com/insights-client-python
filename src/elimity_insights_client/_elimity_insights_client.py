@@ -223,7 +223,7 @@ def _cert(certificate: Optional[Certificate]) -> Optional[Tuple[str, str]]:
 
 def _compress_domain_graph(json: object) -> Iterable[bytes]:
     compress = compressobj()
-    for json_string_chunk in encoder.iterencode(json, False):
+    for json_string_chunk in encoder.iterencode(json):
         json_bytes_chunk = json_string_chunk.encode()
         yield compress.compress(json_bytes_chunk)
     yield compress.flush()
