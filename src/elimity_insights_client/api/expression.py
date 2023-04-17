@@ -147,6 +147,16 @@ class DirectLinkAggregateNumberExpression:
 
 
 @dataclass
+class ExistsBooleanExpression:
+    """Expression evaluating whether a given condition holds for some entity of a given type."""
+
+    alias: str
+    condition: "BooleanExpression"
+    entity_type: str
+    source_id: int
+
+
+@dataclass
 class IdInBooleanExpression:
     """Expression evaluating whether an entity's identifier occurs in a given list."""
 
@@ -304,7 +314,16 @@ class MatchOperator(Enum):
     CONTAINS = auto()
     ENDS_WITH = auto()
     EQUALS = auto()
+    SPLIT_INTERSECTS = auto()
     STARTS_WITH = auto()
+
+
+@dataclass
+class MatchesPatternBooleanExpression:
+    """Expression matching the result of a given expression to a given pattern."""
+
+    expr: "StringExpression"
+    pattern: str
 
 
 @dataclass
@@ -404,12 +423,14 @@ BooleanExpression = Union[
     DateCmpBooleanExpression,
     DateTimeCmpBooleanExpression,
     DirectlyLinkedToBooleanExpression,
+    ExistsBooleanExpression,
     IdInBooleanExpression,
     LinkAssignedBooleanExpression,
     LinkAttributeBooleanExpression,
     LinkedToBooleanExpression,
     LiteralBooleanExpression,
     MatchBooleanExpression,
+    MatchesPatternBooleanExpression,
     NotBooleanExpression,
     NumberCmpBooleanExpression,
     TimeCmpBooleanExpression,
