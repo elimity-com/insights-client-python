@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional, Set
 
 from elimity_insights_client.api._api import Config
 from elimity_insights_client.api._api import query as api_query
