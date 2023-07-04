@@ -26,7 +26,9 @@ def entities(
     schemas = {
         source.id: source.domain_graph_schema
         for source in sos
-        if linked_source_ids is None or source.id in linked_source_ids
+        if source.id == entity_type.source_id
+        or linked_source_ids is None
+        or source.id in linked_source_ids
     }
     que = query(entity_type, schemas)
     queries = [que]
