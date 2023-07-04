@@ -23,12 +23,11 @@ def entities(
     """
 
     sos = sources(config)
-    sources_to_use = [
-        source
+    schemas = {
+        source.id: source.domain_graph_schema
         for source in sos
         if linked_source_ids is None or source.id in linked_source_ids
-    ]
-    schemas = {source.id: source.domain_graph_schema for source in sources_to_use}
+    }
     que = query(entity_type, schemas)
     queries = [que]
     (page,) = api_query(config, queries)
