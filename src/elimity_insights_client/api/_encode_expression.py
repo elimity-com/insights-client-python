@@ -22,6 +22,7 @@ from elimity_insights_client.api.expression import (
     DateTimeExpression,
     DirectLinkAggregateNumberExpression,
     DirectlyLinkedToBooleanExpression,
+    ExistsBooleanExpression,
     IdInBooleanExpression,
     IdStringExpression,
     LinkAggregateNumberExpression,
@@ -40,6 +41,7 @@ from elimity_insights_client.api.expression import (
     LiteralStringExpression,
     LiteralTimeExpression,
     MatchBooleanExpression,
+    MatchesPatternBooleanExpression,
     MatchMode,
     MatchOperator,
     NameStringExpression,
@@ -109,6 +111,16 @@ def encode_boolean_expression(expression: BooleanExpression) -> object:
             "type": "directlyLinkedTo",
         }
 
+    if isinstance(expression, ExistsBooleanExpression):
+        condition = encode_boolean_expression(expression.condition)
+        return {
+            "alias": expression.alias,
+            "condition": condition,
+            "entityType": expression.entity_type,
+            "sourceId": expression.source_id,
+            "type": "exists",
+        }
+
     if isinstance(expression, IdInBooleanExpression):
         return {
             "ids": expression.ids,
@@ -152,6 +164,14 @@ def encode_boolean_expression(expression: BooleanExpression) -> object:
             "operator": operator,
             "rhs": rhs,
             "type": "match",
+        }
+
+    if isinstance(expression, MatchesPatternBooleanExpression):
+        expr = encode_string_expression(expression.expr)
+        return {
+            "expr": expr,
+            "pattern": expression.pattern,
+            "type": "matchesPattern",
         }
 
     if isinstance(expression, NotBooleanExpression):
@@ -409,6 +429,9 @@ def _encode_match_operator(operator: MatchOperator) -> object:
 
     if operator is MatchOperator.EQUALS:
         return "equals"
+
+    if operator is MatchOperator.SPLIT_INTERSECTS:
+        return "splitIntersects"
 
     if operator is MatchOperator.STARTS_WITH:
         return "startsWith"

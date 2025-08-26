@@ -167,6 +167,9 @@
           "$ref": "#/definitions/directlyLinkedToBooleanExpression"
         },
         {
+          "$ref": "#/definitions/existsBooleanExpression"
+        },
+        {
           "$ref": "#/definitions/idInBooleanExpression"
         },
         {
@@ -183,6 +186,9 @@
         },
         {
           "$ref": "#/definitions/matchBooleanExpression"
+        },
+        {
+          "$ref": "#/definitions/matchesPatternBooleanExpression"
         },
         {
           "$ref": "#/definitions/notBooleanExpression"
@@ -490,6 +496,34 @@
         "linkAlias",
         "type",
         "sourceId"
+      ],
+      "type": "object"
+    },
+    "existsBooleanExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "alias": {
+          "type": "string"
+        },
+        "condition": {
+          "$ref": "#/definitions/booleanExpression"
+        },
+        "entityType": {
+          "type": "string"
+        },
+        "sourceId": {
+          "type": "integer"
+        },
+        "type": {
+          "const": "exists"
+        }
+      },
+      "required": [
+        "alias",
+        "condition",
+        "entityType",
+        "sourceId",
+        "type"
       ],
       "type": "object"
     },
@@ -852,6 +886,26 @@
       ],
       "type": "object"
     },
+    "matchesPatternBooleanExpression": {
+      "additionalProperties": false,
+      "properties": {
+        "expr": {
+          "$ref": "#/definitions/stringExpression"
+        },
+        "pattern": {
+          "type": "string"
+        },
+        "type": {
+          "const": "matchesPattern"
+        }
+      },
+      "required": [
+        "expr",
+        "pattern",
+        "type"
+      ],
+      "type": "object"
+    },
     "matchMode": {
       "enum": [
         "caseInsensitive",
@@ -863,6 +917,7 @@
         "contains",
         "endsWith",
         "equals",
+        "splitIntersects",
         "startsWith"
       ]
     },
