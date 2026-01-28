@@ -28,9 +28,36 @@ if __name__ == "__main__":
 
 ### Other API interactions
 
-This module also provides a client for other API interactions with Elimity Insights. The snippet below shows how to
-authenticate with an API token and list sources at an Elimity Insights server. You can generate a token identifier and
-secret by visiting the 'API tokens' page in Elimity Insights and clicking the 'CREATE API TOKEN' button.
+This module also provides a client for other API interactions with Elimity Insights. The snippets below show how to
+execute queries and list sources respectively. Both use an API token for authentication. You can generate a token
+identifier and secret by visiting the 'API tokens' page in Elimity Insights and clicking the 'CREATE API TOKEN' button.
+
+#### Executing queries
+
+```python3
+from elimity_insights_client.api import Config, query
+from elimity_insights_client.api.expression import AttributeBooleanExpression
+from elimity_insights_client.query import AnyExpression, DirectLinkGroupByQuery, DirectLinkQuery, LinkGroupByQuery, Ordering, Query
+
+if __name__ == "__main__":
+    config = Config(token_id="1", token_secret="my-secret-value", url="https://example.elimity.com", verify_ssl=True)
+    condition = AttributeBooleanExpression("isShareByEmailGuestUser", "u")
+    direct_link_group_by_queries: list[DirectLinkGroupByQuery] = []
+    direct_link_queries: list[DirectLinkQuery] = []
+    include: list[AnyExpression] = []
+    link_group_by_queries: list[LinkGroupByQuery] = []
+    link_queries: list[Query] = []
+    orderings: list[Ordering] = []
+    q = Query(
+        "u", condition, direct_link_group_by_queries, direct_link_queries, "user", include, 10, link_group_by_queries,
+        link_queries, 0, orderings, 1
+    )
+    queries = [q]
+    pages = query(config, queries)
+    print(pages)
+```
+
+#### Listing sources
 
 ```python3
 from elimity_insights_client.api import Config, sources
