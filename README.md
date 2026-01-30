@@ -34,6 +34,8 @@ identifier and secret by visiting the 'API tokens' page in Elimity Insights and 
 
 #### Executing queries
 
+The following example performs the query "find all users for which isShareByEmailGuestUser is true" on source with identifier `1` without specific attributes, ordering or grouping.
+
 ```python3
 from elimity_insights_client.api import Config, query
 from elimity_insights_client.api.expression import AttributeBooleanExpression
